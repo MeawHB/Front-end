@@ -49,8 +49,8 @@ http
                 post = querystring.parse(post);
                 console.log('post:', post);
                 res.writeHead(200, {
-                    "Content-Type": 'text/json,charset=utf-8',
-                    'Access-Control-Allow-Origin': '*',
+                    "Content-Type": 'text/json',
+                    'charset': 'utf-8', 'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS'
                 });
                 var data = [
