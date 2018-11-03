@@ -30,16 +30,16 @@
     var box = document.getElementById("box");
     document.addEventListener('keydown', function (event) {
         if (event.code === 'ArrowUp' && ball.offsetTop > 0) {
-            ball.style.top = ball.offsetTop - 50 + 'px'
+            ball.style.top = ball.offsetTop - 5 + 'px'
         }
         if (event.code === 'ArrowDown' && ball.offsetTop<box.clientHeight-ball.offsetHeight) {
-            ball.style.top = ball.offsetTop + 50 + 'px';
+            ball.style.top = ball.offsetTop + 5 + 'px';
         }
         if (event.code === 'ArrowLeft' && ball.offsetLeft > 0) {
-            ball.style.left = ball.offsetLeft - 50 + 'px'
+            ball.style.left = ball.offsetLeft - 5 + 'px'
         }
         if (event.code === 'ArrowRight' && ball.offsetLeft<box.clientWidth-ball.offsetWidth) {
-            ball.style.left = ball.offsetLeft + 50 + 'px'
+            ball.style.left = ball.offsetLeft + 5 + 'px'
         }
         console.log(event.code, event.keyCode);
         console.log("坐标：",ball.offsetLeft, ball.offsetTop)
