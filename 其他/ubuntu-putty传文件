@@ -1,0 +1,9 @@
+下载pscp
+
+在windows的pscp目录下运行
+.\pscp -C -r -pw 密码  E:\shitang 用户名@192.168.1.55:/home/shitang/nodejsshitang
+                       windows目录                    服务器目录
+参数说明：
+-r copy directories recursively 复制子文件夹
+-pw 密码
+-C 打开压缩
