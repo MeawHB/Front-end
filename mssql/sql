@@ -1,0 +1,9 @@
+--上个月1号
+select CONVERT(varchar(7), dateadd(mm,-1,getdate()) , 120) + '-1'
+--本月1号
+select CONVERT(varchar(7), getdate() , 120) + '-1'
+--下个月1号
+select CONVERT(varchar(7), dateadd(mm,1,getdate()) , 120) + '-1'
+--本月天数
+select day(dateadd(mm,1,getdate())-day(getdate()))
+
