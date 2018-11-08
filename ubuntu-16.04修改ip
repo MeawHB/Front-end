@@ -1,0 +1,13 @@
+u16.04修改网卡
+
+vi /etc/network/interfaces
+
+添加
+
+auto eth0
+iface eth0 inet static
+address 198.1.1.5    
+netmask 255.255.255.0
+gateway 198.1.1.254
+dns-nameserver 198.1.1.1
+
