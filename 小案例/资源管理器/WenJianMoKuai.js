@@ -3,30 +3,42 @@
  */
 var fs = require("fs");
 var path = require("path")
+var getconfig = require("./getconfig");
 
 class WenJianMoKuai {
-
     /**
      * 获取传入文件夹路径内的文件数组列表
      */
-    getWenJianJia(temp_path) {
+    getWenJianJia(url_path, file_path) {
         let list = [];
-        temp_path = this.getJueDuiLuJing(temp_path);
+        let temp_path = this.getJueDuiLuJing(file_path);
         var files = fs.readdirSync(temp_path);
-
         if (files.length > 0) {
             files.forEach(item => {
                 var ab_path = path.join(temp_path,item)
                 var stats = fs.statSync(ab_path);
 
                 if(stats.isDirectory()){
-                    list.push({file:ab_path,isDirectory:true})
+                    list.push({file_path:ab_path,url_path:url_path+'/'+item,isDirectory:true})
                 }else{
-                    list.push({file:ab_path,isDirectory:false})
+                    list.push({file_path:ab_path,url_path:url_path+'/'+item,isDirectory:false})
                 }
             })
         }
         return list;
+    }
+
+    /**
+     * 传入路径，返回是否是文件夹
+     */
+    getShiFouWenJianJia(file_path){
+        let ab_path = this.getJueDuiLuJing(file_path);
+        let stats = fs.statSync(ab_path);
+        if(stats.isDirectory()){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /**
@@ -39,7 +51,6 @@ class WenJianMoKuai {
             return path.join(__dirname, temppath);
         }
     }
-
     /**
      * 获取后缀名
      * filePath: "http://127.0.0.1/index.html?a=1&&b=2"     返回 html

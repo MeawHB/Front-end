@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../public/jquery-3.3.1.js"></script>
+</head>
+<body>
+<div>
+    <p id="p"></p>
+    <table style="border:solid 1px">
+        <thead>
+        <tr>
+            <td>url路径</td>
+            <td>文件名</td>
+            <td>是否文件夹</td>
+        </tr>
+        </thead>
+        <tbody id="tbody">
+        </tbody>
+    </table>
+</div>
+<script>
+    function getfilelist(url){
+        $.ajax({
+            type: "GET",
+            url,
+            dataType: "json",
+            success: function (result) {
+                $('#p').html(url)
+                console.log(result)
+                $('#tbody').empty()
+                $.each(result, function (index, value) {
+                    if(value.isDirectory){
+                        trhtml = `<tr>
+                            <td>${value.url_path}</td>
+                            <td>${value.file_path}</a></td>
+                            <td>${value.isDirectory}</td>
+                            <td><a href="javascript:void(0)" isdir=true>进入</a></td>
+                          </tr>`
+                    }else{
+                        trhtml = `<tr>
+                            <td>${value.url_path}</td>
+                            <td>${value.file_path}</td>
+                            <td>${value.isDirectory}</td>
+                            <td><a href="${value.url_path}" isdir=false>下载</a></td>
+                          </tr>`
+                    }
+                    $('#tbody').append(trhtml)
+                });
+            }
+        });
+    }
+
+    getfilelist("/files");
+
+    $('#tbody').on('click','a',function () {
+        let file_path = $(this).parent().parent().children().first().text();
+        if($(this).attr('isdir')){
+            getfilelist(file_path);
+        }
+    })
+</script>
+</body>
+</html>

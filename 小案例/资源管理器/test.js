@@ -10,7 +10,7 @@ var ext = WenJianMoKuai.getHouZhuiMing(url)
 console.log('ext',ext);
 
 var config = getconfig()
-console.log('config:',config)
+console.log('config:',getconfig().port)
 
 console.log(WenJianMoKuai.getJueDuiLuJing("./public"));
 console.log(WenJianMoKuai.getJueDuiLuJing("c:\\"));
