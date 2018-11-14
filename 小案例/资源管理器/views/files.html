@@ -14,37 +14,64 @@
             <td>url路径</td>
             <td>文件名</td>
             <td>是否文件夹</td>
+            <td>操作</td>
         </tr>
         </thead>
         <tbody id="tbody">
+
         </tbody>
     </table>
 </div>
 <script>
+    var list_url = [];
+    var temp_url = null;
+    var list_length = 0;
     function getfilelist(url){
         $.ajax({
             type: "GET",
             url,
             dataType: "json",
             success: function (result) {
-                $('#p').html(url)
-                console.log(result)
-                $('#tbody').empty()
+                if (url === '/files') {
+                    list_url = [];
+                    temp_url = {url: url, parent_url: 0};
+                    list_url.push(temp_url);
+                } else {
+                    let flag = false;
+                    $.each(list_url, function (index, item) {
+                        console.log('item.url:', item.url);
+                        console.log('url:', url);
+                        console.log('item.url === url:', item.url === url, 'index:', index);
+                        if (item.url === url) {
+                            list_length = index;
+                            flag = true;
+                            return false;
+                        }
+                    });
+                    if (flag) {
+                        list_url = list_url.slice(0, list_length + 1);
+                    } else {
+                        temp_url = {url: url, parent_url: temp_url.url};
+                        list_url.push(temp_url);
+                    }
+                }
+                console.log('list_url:', list_url);
+                $('#p').empty();
+                $.each(list_url, function (index, item) {
+                    $('#p').append(`<a href="javascript:void(0)" isdir=true>${item.url}</a>` + "->")
+                });
+
+                console.log('result:', result);
+                $('#tbody').empty();
                 $.each(result, function (index, value) {
+                    trhtml = `<tr>
+                                <td>${value.url_path}</td>
+                                <td>${value.file_path}</a></td>
+                                <td>${value.isDirectory}</td>`;
                     if(value.isDirectory){
-                        trhtml = `<tr>
-                            <td>${value.url_path}</td>
-                            <td>${value.file_path}</a></td>
-                            <td>${value.isDirectory}</td>
-                            <td><a href="javascript:void(0)" isdir=true>进入</a></td>
-                          </tr>`
+                        trhtml = trhtml + `<td><a href="javascript:void(0)" isdir=true>进入</a></td></tr>`
                     }else{
-                        trhtml = `<tr>
-                            <td>${value.url_path}</td>
-                            <td>${value.file_path}</td>
-                            <td>${value.isDirectory}</td>
-                            <td><a href="${value.url_path}" isdir=false>下载</a></td>
-                          </tr>`
+                        trhtml = trhtml + `<td><a href="${value.url_path}" isdir=false>下载</a></td></tr>`
                     }
                     $('#tbody').append(trhtml)
                 });
@@ -55,10 +82,14 @@
     getfilelist("/files");
 
     $('#tbody').on('click','a',function () {
-        let file_path = $(this).parent().parent().children().first().text();
+        let url_path = $(this).parent().parent().children().first().text();
         if($(this).attr('isdir')){
-            getfilelist(file_path);
+            getfilelist(url_path);
         }
+    });
+    $('#p').on('click', 'a', function () {
+        let url_path = $(this).text();
+        getfilelist(url_path);
     })
 </script>
 </body>
