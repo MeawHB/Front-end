@@ -4,6 +4,11 @@ var url = require('url');
 var querystring = require('querystring');
 var WenJianMoKuai = require("./WenJianMoKuai");
 var getconfig = require("./getconfig");
+// var options = {
+//     key: fs.readFileSync('ssh_key.pem'),   //加载https证书
+//     cert: fs.readFileSync('ssh_cert.pem')
+//
+// };
 
 http
     .createServer(function (req, res) {
@@ -26,7 +31,8 @@ http
         } else if (url_path.indexOf('/files') === 0) {
             let file_path = getconfig().directory + url_path.substring(6);
             console.log('请求文件路径: ', file_path);
-            file_path = decodeURI(file_path);
+            file_path = decodeURI(file_path);   //中文乱码解码
+            url_path = decodeURI(url_path);
             console.log('请求文件路径decodeURI: ', file_path);
             console.log('请求文件是否文件夹: ', WenJianMoKuai.getShiFouWenJianJia(file_path));
 

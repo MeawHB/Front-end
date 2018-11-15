@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="../public/bootstrap.css">
     <script src="../public/jquery-3.3.1.js"></script>
 </head>
 <body>
 <div>
-    <p id="p"></p>
-    <table style="border:solid 1px">
+    <ol id="ol" class="breadcrumb">
+        <!--<li><a href="#">Home</a></li>-->
+        <!--<li><a href="#">Library</a></li>-->
+        <!--<li class="active">Data</li>-->
+    </ol>
+    <table class="table table-hover">
         <thead>
         <tr>
             <td>url路径</td>
@@ -23,18 +28,19 @@
     </table>
 </div>
 <script>
+    var root_url = "/files";
+
     /**
      * list_url 目录树列表
      * temp_url 当前目录
      * list_length 目录树长度
-     * url ajax访问url
+     * muLuChuLi(url)  ajax访问url
      */
     var list_url = [];
     var temp_url = null;
     var list_length = 0;
-
-    function muLuChuLi(url){
-        if (url === '/files') {
+    function muLuChuLi(url) {
+        if (url === root_url) {
             list_url = [];
             temp_url = {url: url, parent_url: 0};
             list_url.push(temp_url);
@@ -59,47 +65,58 @@
             }
         }
         console.log('list_url:', list_url);
-        $('#p').empty();
+        $('#ol').empty();
         $.each(list_url, function (index, item) {
-            $('#p').append(`<a href="javascript:void(0)" isdir=true>${item.url}</a>` + "->")
+            let temp = item.url.split('/');
+            temp = temp[temp.length-1];
+            $('#ol').append(`<li><a href="${item.url}" isdir=yes>${temp}</a></li>`)
         });
     }
 
-    function getfilelist(url){
+    // result  ajax返回结果（json对象）
+    function wenJianChuLi(result) {
+        $('#tbody').empty();
+        $.each(result, function (index, value) {
+            trhtml = `<tr>
+                            <td>${value.url_path}</td>
+                            <td>${value.file_path}</a></td>
+                            <td>${value.isDirectory}</td>`;
+            if (value.isDirectory) {
+                trhtml = trhtml + `<td><a href="${value.url_path}" isdir="yes">进入</a></td></tr>`;
+            } else {
+                trhtml = trhtml + `<td><a href="${value.url_path}" isdir="no">下载</a></td></tr>`;
+            }
+            $('#tbody').append(trhtml);
+        });
+    }
+
+    function getfilelist(url) {
         $.ajax({
             type: "GET",
             url,
             dataType: "json",
             success: function (result) {
-                muLuChuLi(url)
-                console.log('result:', result);
-                $('#tbody').empty();
-                $.each(result, function (index, value) {
-                    trhtml = `<tr>
-                                <td>${value.url_path}</td>
-                                <td>${value.file_path}</a></td>
-                                <td>${value.isDirectory}</td>`;
-                    if(value.isDirectory){
-                        trhtml = trhtml + `<td><a href="javascript:void(0)" isdir=true>进入</a></td></tr>`
-                    }else{
-                        trhtml = trhtml + `<td><a href="${value.url_path}" isdir=false>下载</a></td></tr>`
-                    }
-                    $('#tbody').append(trhtml)
-                });
+                console.log('ajax----result: ', result);
+                muLuChuLi(url);
+                wenJianChuLi(result);
             }
         });
     }
 
-    getfilelist("/files");
+    getfilelist(root_url);
 
-    $('#tbody').on('click','a',function () {
-        let url_path = $(this).parent().parent().children().first().text();
-        if($(this).attr('isdir')){
+    $('#tbody').on('click', 'a', function (e) {
+        // let url_path = $(this).parent().parent().children().first().text();
+        let url_path = $(this).attr("href");
+        if ($(this).attr('isdir')==="yes"){
+            e.preventDefault();
             getfilelist(url_path);
         }
     });
-    $('#p').on('click', 'a', function () {
-        let url_path = $(this).text();
+
+    $('#ol').on('click', 'a', function (e) {
+        e.preventDefault();
+        let url_path = $(this).attr("href");
         getfilelist(url_path);
     })
 </script>
