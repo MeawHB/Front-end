@@ -7,28 +7,24 @@
     <script src="../public/jquery-3.3.1.js"></script>
 </head>
 <body>
-<div>
-    <div>
+<div class="col-md-12">
+    <div class="col-md-12">
         <ol id="ol" class="breadcrumb">
             <!--<li><a href="#">Home</a></li>-->
             <!--<li><a href="#">Library</a></li>-->
             <!--<li class="active">Data</li>-->
         </ol>
     </div>
-    <div>
+    <div class="col-md-6">
         <table class="table table-hover">
             <thead>
             <tr>
-                <!--<td class="col-md-2">文件名</td>-->
-                <!--<td class="col-md-2">url路径</td>-->
-                <!--<td class="col-md-2">服务器路径</td>-->
-                <!--<td class="col-md-2">是否文件夹</td>-->
-                <!--<td class="col-md-2">操作</td>-->
-                <td>文件名</td>
-                <td>url路径</td>
-                <td>服务器路径</td>
-                <td>是否文件夹</td>
-                <td>操作</td>
+                <td class="col-md-3">文件名</td>
+                <!--<td>url路径</td>-->
+                <!--<td>服务器路径</td>-->
+                <!--<td>是否文件夹</td>-->
+                <td class="col-md-1">打开</td>
+                <td class="col-md-1">下载</td>
             </tr>
             </thead>
             <tbody id="tbody">
@@ -88,11 +84,7 @@
     function wenJianChuLi(result) {
         $('#tbody').empty();
         $.each(result, function (index, value) {
-            trhtml = `<tr>
-                            <td>${value.file_name}</td>
-                            <td>${value.url_path}</td>
-                            <td>${value.file_path}</a></td>
-                            <td>${value.isDirectory}</td>`;
+            trhtml = `<tr><td>${value.file_name}</td>`;
             if (value.isDirectory) {
                 trhtml = trhtml + `<td><a href="${value.url_path}" isdir="yes">进入</a></td>
                                    <td><a href="${value.url_path}?download=yes" isdownload="yes" isdir="yes">下载</a></td></tr>`;
