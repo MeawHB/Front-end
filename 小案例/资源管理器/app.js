@@ -4,16 +4,17 @@ var url = require('url');
 var querystring = require('querystring');
 var WenJianMoKuai = require("./WenJianMoKuai");
 var getconfig = require("./getconfig");
-// var options = {
-//     key: fs.readFileSync('ssh_key.pem'),   //加载https证书
-//     cert: fs.readFileSync('ssh_cert.pem')
-//
-// };
+var jszip = require("./public/jszip");
 
 http
     .createServer(function (req, res) {
+        console.log('req.url:',req.url)
+        console.log('querystring.parse',querystring.parse(req.url))
         var parseObj = url.parse(req.url, true);
         var url_path = parseObj.pathname;
+        var obj_query = parseObj.query;
+        console.log('obj_query',obj_query)
+
         if (url_path === '/') {
             fs.readFile('./views/files.html', function (err, data) {
                 if (err) {
@@ -37,15 +38,31 @@ http
             console.log('请求文件是否文件夹: ', WenJianMoKuai.getShiFouWenJianJia(file_path));
 
             if (WenJianMoKuai.getShiFouWenJianJia(file_path)) {
-                var filelist = WenJianMoKuai.getWenJianJia(url_path, file_path);
-                // console.log(filelist)
-                res.writeHead(200, {
-                    "Content-Type": 'application/json',
-                    'charset': 'utf-8', 'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS'
-                });
-                res.end(JSON.stringify(filelist))
+                if(obj_query.download === "yes"){
+                    let obj_zip = WenJianMoKuai.zipWenJianJia(file_path)
+                    console.log('kaishixiazai:')
+                    res.writeHead(200, {
+                        'Content-Type': 'application/octet-stream;charset=utf8',
+                        'Content-Disposition': 'attachment; filename*="utf8\'\'' + obj_zip.zip_name + '.zip"'
+                    });
+                    obj_zip.zip.generateNodeStream({ streamFile: true })
+                        .pipe(res)
+                        .on('finish', function() {
+                            res.end();
+                        });
+                }else{
+                    var filelist = WenJianMoKuai.getWenJianJia(url_path, file_path);
+                    // console.log(filelist)
+                    res.writeHead(200, {
+                        "Content-Type": 'application/json',
+                        'charset': 'utf-8', 'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS'
+                    });
+                    res.end(JSON.stringify(filelist))
+                }
+
             } else {
+                console.log('jszip')
                 var f = fs.createReadStream(file_path);
                 let arr = file_path.split('/');
                 file_name = encodeURI(arr[arr.length - 1]);
@@ -61,7 +78,6 @@ http
                     return res.end('404 Not Found.')
                 }
                 res.end(data)
-
             })
         }
     })

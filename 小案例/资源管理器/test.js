@@ -22,8 +22,9 @@ var file = fs.readdirSync('d:\\')
 var stats = fs.statSync("D:\\github\\Front-end\\小案例\\资源管理器\\test.js");
 // console.log(stats);
 
-var list = WenJianMoKuai.getWenJianJia("../../../../cp");
-console.log(list);
+// var list = WenJianMoKuai.getWenJianJia("../../../../cp");
+// console.log(list);
 
-
+var myzip =  WenJianMoKuai.zipWenJianJia("D:\\github\\Front-end\\小案例\\资源管理器\\test")
+console.log('myzip',myzip)
 

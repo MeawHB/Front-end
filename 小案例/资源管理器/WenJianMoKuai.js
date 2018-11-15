@@ -2,10 +2,44 @@
  * 参考链接 https://github.com/shushanfx/nfile
  */
 var fs = require("fs");
-var path = require("path")
+var path = require("path");
 var getconfig = require("./getconfig");
+var jszip = require("./public/jszip");
 
 class WenJianMoKuai {
+    /**
+     * 打包文件夹
+     */
+    zipWenJianJia(dir_path){
+        if(this.getShiFouWenJianJia(dir_path)){
+            let ab_path = this.getJueDuiLuJing(dir_path);
+            let zip_name = path.basename(dir_path);
+
+            console.log('dir_path', dir_path)
+            console.log('ab_path', ab_path)
+            console.log('zip_name',zip_name)
+
+            var zip = new jszip()
+            zip.folder(zip_name)
+
+            var ziWenJianJia = function(ab_path,zip_name,zip) {
+                var list = fs.readdirSync(ab_path)
+                list.forEach(function(item) {
+                    var new_ab_path = path.join(ab_path, item)
+                    var st = fs.statSync(new_ab_path)
+                    if (!st.isDirectory()) {
+                        zip.file(zip_name+'/'+item, fs.readFileSync(new_ab_path))
+                    } else{
+                        ziWenJianJia(new_ab_path,zip_name+'/'+item, zip)
+                    }
+                })
+            }
+            ziWenJianJia(ab_path,zip_name,zip)
+            // console.log(zip);
+            return {zip_name:zip_name, zip:zip};
+        }
+    }
+
     /**
      * 获取传入文件夹路径内的文件数组列表
      */
@@ -15,7 +49,7 @@ class WenJianMoKuai {
         var files = fs.readdirSync(temp_path);
         if (files.length > 0) {
             files.forEach(item => {
-                var ab_path = path.join(temp_path,item)
+                var ab_path = path.join(temp_path,item);
                 var stats = fs.statSync(ab_path);
 
                 if(stats.isDirectory()){
