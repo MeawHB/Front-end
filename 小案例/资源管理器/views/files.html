@@ -16,8 +16,9 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            <td>url路径</td>
             <td>文件名</td>
+            <td>url路径</td>
+            <td>服务器路径</td>
             <td>是否文件夹</td>
             <td>操作</td>
         </tr>
@@ -78,6 +79,7 @@
         $('#tbody').empty();
         $.each(result, function (index, value) {
             trhtml = `<tr>
+                            <td>${value.file_name}</td>
                             <td>${value.url_path}</td>
                             <td>${value.file_path}</a></td>
                             <td>${value.isDirectory}</td>`;

@@ -19,9 +19,9 @@ class WenJianMoKuai {
                 var stats = fs.statSync(ab_path);
 
                 if(stats.isDirectory()){
-                    list.push({file_path:ab_path,url_path:url_path+'/'+item,isDirectory:true})
+                    list.push({file_path:ab_path, url_path:url_path+'/'+item, file_name:item, isDirectory:true})
                 }else{
-                    list.push({file_path:ab_path,url_path:url_path+'/'+item,isDirectory:false})
+                    list.push({file_path:ab_path, url_path:url_path+'/'+item, file_name:item, isDirectory:false})
                 }
             })
         }
