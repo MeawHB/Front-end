@@ -23,44 +23,55 @@
     </table>
 </div>
 <script>
+    /**
+     * list_url 目录树列表
+     * temp_url 当前目录
+     * list_length 目录树长度
+     * url ajax访问url
+     */
     var list_url = [];
     var temp_url = null;
     var list_length = 0;
+
+    function muLuChuLi(url){
+        if (url === '/files') {
+            list_url = [];
+            temp_url = {url: url, parent_url: 0};
+            list_url.push(temp_url);
+        } else {
+            // 如果当前列表存在要访问的url则切割；如果不存在则添加新的url
+            let flag = false;
+            $.each(list_url, function (index, item) {
+                console.log('item.url:', item.url);
+                console.log('url_path:', url);
+                console.log('item.url === url:', item.url === url, 'index:', index);
+                if (item.url === url) {
+                    list_length = index;
+                    flag = true;
+                    return false;
+                }
+            });
+            if (flag) {
+                list_url = list_url.slice(0, list_length + 1);
+            } else {
+                temp_url = {url: url, parent_url: temp_url.url};
+                list_url.push(temp_url);
+            }
+        }
+        console.log('list_url:', list_url);
+        $('#p').empty();
+        $.each(list_url, function (index, item) {
+            $('#p').append(`<a href="javascript:void(0)" isdir=true>${item.url}</a>` + "->")
+        });
+    }
+
     function getfilelist(url){
         $.ajax({
             type: "GET",
             url,
             dataType: "json",
             success: function (result) {
-                if (url === '/files') {
-                    list_url = [];
-                    temp_url = {url: url, parent_url: 0};
-                    list_url.push(temp_url);
-                } else {
-                    let flag = false;
-                    $.each(list_url, function (index, item) {
-                        console.log('item.url:', item.url);
-                        console.log('url:', url);
-                        console.log('item.url === url:', item.url === url, 'index:', index);
-                        if (item.url === url) {
-                            list_length = index;
-                            flag = true;
-                            return false;
-                        }
-                    });
-                    if (flag) {
-                        list_url = list_url.slice(0, list_length + 1);
-                    } else {
-                        temp_url = {url: url, parent_url: temp_url.url};
-                        list_url.push(temp_url);
-                    }
-                }
-                console.log('list_url:', list_url);
-                $('#p').empty();
-                $.each(list_url, function (index, item) {
-                    $('#p').append(`<a href="javascript:void(0)" isdir=true>${item.url}</a>` + "->")
-                });
-
+                muLuChuLi(url)
                 console.log('result:', result);
                 $('#tbody').empty();
                 $.each(result, function (index, value) {
