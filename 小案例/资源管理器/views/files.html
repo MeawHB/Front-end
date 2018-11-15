@@ -8,25 +8,34 @@
 </head>
 <body>
 <div>
-    <ol id="ol" class="breadcrumb">
-        <!--<li><a href="#">Home</a></li>-->
-        <!--<li><a href="#">Library</a></li>-->
-        <!--<li class="active">Data</li>-->
-    </ol>
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <td>文件名</td>
-            <td>url路径</td>
-            <td>服务器路径</td>
-            <td>是否文件夹</td>
-            <td>操作</td>
-        </tr>
-        </thead>
-        <tbody id="tbody">
+    <div>
+        <ol id="ol" class="breadcrumb">
+            <!--<li><a href="#">Home</a></li>-->
+            <!--<li><a href="#">Library</a></li>-->
+            <!--<li class="active">Data</li>-->
+        </ol>
+    </div>
+    <div>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <!--<td class="col-md-2">文件名</td>-->
+                <!--<td class="col-md-2">url路径</td>-->
+                <!--<td class="col-md-2">服务器路径</td>-->
+                <!--<td class="col-md-2">是否文件夹</td>-->
+                <!--<td class="col-md-2">操作</td>-->
+                <td>文件名</td>
+                <td>url路径</td>
+                <td>服务器路径</td>
+                <td>是否文件夹</td>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody id="tbody">
 
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>
 <script>
     var root_url = "/files";
@@ -40,6 +49,7 @@
     var list_url = [];
     var temp_url = null;
     var list_length = 0;
+
     function muLuChuLi(url) {
         if (url === root_url) {
             list_url = [];
@@ -69,7 +79,7 @@
         $('#ol').empty();
         $.each(list_url, function (index, item) {
             let temp = item.url.split('/');
-            temp = temp[temp.length-1];
+            temp = temp[temp.length - 1];
             $('#ol').append(`<li><a href="${item.url}" isdir=yes>${temp}</a></li>`)
         });
     }
@@ -111,10 +121,10 @@
     $('#tbody').on('click', 'a', function (e) {
         // let url_path = $(this).parent().parent().children().first().text();
         let url_path = $(this).attr("href");
-        if ($(this).attr('isdir')==="yes"){
-            if($(this).attr('isdownload')==="yes"){
+        if ($(this).attr('isdir') === "yes") {
+            if ($(this).attr('isdownload') === "yes") {
                 //下载行为默认
-            }else{
+            } else {
                 e.preventDefault();
                 getfilelist(url_path);
             }
