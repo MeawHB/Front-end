@@ -94,10 +94,10 @@
                             <td>${value.file_path}</a></td>
                             <td>${value.isDirectory}</td>`;
             if (value.isDirectory) {
-                trhtml = trhtml + `<td><a href="${value.url_path}" isdir="yes">进入</a>
-                                        <a href="${value.url_path}?download=yes" isdownload="yes" isdir="yes">下载</a></td></tr>`;
+                trhtml = trhtml + `<td><a href="${value.url_path}" isdir="yes">进入</a></td>
+                                   <td><a href="${value.url_path}?download=yes" isdownload="yes" isdir="yes">下载</a></td></tr>`;
             } else {
-                trhtml = trhtml + `<td><a href="${value.url_path}" isdir="no">下载</a></td></tr>`;
+                trhtml = trhtml + `<td></td><td><a href="${value.url_path}" isdir="no">下载</a></td></tr>`;
             }
             $('#tbody').append(trhtml);
         });
