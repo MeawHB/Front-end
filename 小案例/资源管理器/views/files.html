@@ -9,20 +9,19 @@
 <body>
 <div class="col-md-12">
     <div class="col-md-12">
-        <ol id="ol" class="breadcrumb">
+        <ol id="ol" class="breadcrumb" style="font-size: 20px;">
             <!--<li><a href="#">Home</a></li>-->
             <!--<li><a href="#">Library</a></li>-->
             <!--<li class="active">Data</li>-->
         </ol>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-7">
         <table class="table table-hover">
             <thead>
             <tr>
-                <td class="col-md-3">文件名</td>
-                <!--<td>url路径</td>-->
-                <!--<td>服务器路径</td>-->
-                <!--<td>是否文件夹</td>-->
+                <td class="col-md-3" id="file_name">文件名</td>
+                <td class="col-md-2" id="mtime">上次修改时间</td>
+                <td class="col-md-1" id="size">大小</td>
                 <td class="col-md-1">打开</td>
                 <td class="col-md-1">下载</td>
             </tr>
@@ -34,18 +33,19 @@
     </div>
 </div>
 <script>
-    var root_url = "/files";
-
     /**
-     * list_url 目录树列表
-     * temp_url 当前目录
-     * list_length 目录树长度
-     * muLuChuLi(url)  ajax访问url
+     * ajax_result 每次获取的结果存入ajax_result    排序用
+     * temp_url 每次访问的地址存入temp_url     muLuChuLi用
+     * list_url 存放目录列表 muLuChuLi用
+     * list_length 目录列表长度
      */
-    var list_url = [];
+    var root_url = "/files";
+    var ajax_result = null;
     var temp_url = null;
+    var list_url = [];
     var list_length = 0;
 
+    // 目录列表处理并显示
     function muLuChuLi(url) {
         if (url === root_url) {
             list_url = [];
@@ -53,18 +53,18 @@
             list_url.push(temp_url);
         } else {
             // 如果当前列表存在要访问的url则切割；如果不存在则添加新的url
-            let flag = false;
+            let flag_muLuChuLi = false;
             $.each(list_url, function (index, item) {
                 console.log('item.url:', item.url);
                 console.log('url_path:', url);
                 console.log('item.url === url:', item.url === url, 'index:', index);
                 if (item.url === url) {
                     list_length = index;
-                    flag = true;
+                    flag_muLuChuLi = true;
                     return false;
                 }
             });
-            if (flag) {
+            if (flag_muLuChuLi) {
                 list_url = list_url.slice(0, list_length + 1);
             } else {
                 temp_url = {url: url, parent_url: temp_url.url};
@@ -80,21 +80,24 @@
         });
     }
 
-    // result  ajax返回结果（json对象）
+    // 根据获取到的文件列表处理并显示  result为ajax返回结果（json对象）
     function wenJianChuLi(result) {
         $('#tbody').empty();
         $.each(result, function (index, value) {
             trhtml = `<tr><td>${value.file_name}</td>`;
             if (value.isDirectory) {
-                trhtml = trhtml + `<td><a href="${value.url_path}" isdir="yes">进入</a></td>
+                trhtml = trhtml + `<td>${value.mtime}</td><td>${value.size}</td>
+                                   <td><a href="${value.url_path}" isdir="yes">进入</a></td>
                                    <td><a href="${value.url_path}?download=yes" isdownload="yes" isdir="yes">下载</a></td></tr>`;
             } else {
-                trhtml = trhtml + `<td></td><td><a href="${value.url_path}" isdir="no">下载</a></td></tr>`;
+                trhtml = trhtml + `<td>${value.mtime}</td><td>${value.size}</td>
+                                    <td></td><td><a href="${value.url_path}" isdir="no">下载</a></td></tr>`;
             }
             $('#tbody').append(trhtml);
         });
     }
 
+    // 请求服务器获取文件夹内文件列表并显示
     function getfilelist(url) {
         $.ajax({
             type: "GET",
@@ -102,6 +105,7 @@
             dataType: "json",
             success: function (result) {
                 console.log('ajax----result: ', result);
+                ajax_result = result;
                 muLuChuLi(url);
                 wenJianChuLi(result);
             }
@@ -110,6 +114,7 @@
 
     getfilelist(root_url);
 
+    // 文件夹打开、下载
     $('#tbody').on('click', 'a', function (e) {
         // let url_path = $(this).parent().parent().children().first().text();
         let url_path = $(this).attr("href");
@@ -123,10 +128,95 @@
         }
     });
 
+    // 目录列表点击
     $('#ol').on('click', 'a', function (e) {
         e.preventDefault();
         let url_path = $(this).attr("href");
         getfilelist(url_path);
+    })
+
+    // flag排序用
+    var flag = true;
+
+    // 按上次修改时间排序
+    $('#mtime').on('click',function () {
+        flag = !flag;
+        if(ajax_result){
+            if(flag){
+                var paixu = ajax_result.sort(
+                    function(a, b)
+                    {
+                        if(a.mtime < b.mtime) return -1;
+                        if(a.mtime > b.mtime) return 1;
+                        return 0;
+                    }
+                );
+            }else{
+                var paixu = ajax_result.sort(
+                    function(a, b)
+                    {
+                        if(b.mtime < a.mtime) return -1;
+                        if(b.mtime > a.mtime) return 1;
+                        return 0;
+                    }
+                );
+            }
+            wenJianChuLi(ajax_result);
+        }
+    })
+
+    // 按文件名排序
+    $('#file_name').on('click',function () {
+        flag = !flag;
+        if(ajax_result){
+            if(flag){
+                var paixu = ajax_result.sort(
+                    function(a, b)
+                    {
+                        if(a.file_name < b.file_name) return -1;
+                        if(a.file_name > b.file_name) return 1;
+                        return 0;
+                    }
+                );
+            }else{
+                var paixu = ajax_result.sort(
+                    function(a, b)
+                    {
+                        if(b.file_name < a.file_name) return -1;
+                        if(b.file_name > a.file_name) return 1;
+                        return 0;
+                    }
+                );
+            }
+            wenJianChuLi(ajax_result);
+        }
+    })
+
+    // 按文件大小排序
+    $('#size').on('click',function () {
+        flag = !flag;
+        if(ajax_result){
+            if(flag){
+                var paixu = ajax_result.sort(
+                    function(a, b)
+                    {
+                        if(a.size < b.size) return -1;
+                        if(a.size > b.size) return 1;
+                        return 0;
+                    }
+                );
+            }else{
+                var paixu = ajax_result.sort(
+                    function(a, b)
+                    {
+                        if(b.size < a.size) return -1;
+                        if(b.size > a.size) return 1;
+                        return 0;
+                    }
+                );
+            }
+            wenJianChuLi(ajax_result);
+        }
     })
 </script>
 </body>

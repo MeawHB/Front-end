@@ -51,11 +51,17 @@ class WenJianMoKuai {
             files.forEach(item => {
                 var ab_path = path.join(temp_path,item);
                 var stats = fs.statSync(ab_path);
-
+                // console.log(stats);
                 if(stats.isDirectory()){
-                    list.push({file_path:ab_path, url_path:url_path+'/'+item, file_name:item, isDirectory:true})
+                    list.push({file_path:ab_path, url_path:url_path+'/'+item, file_name:item,
+                                isDirectory:true,
+                                size:this.getWenJianDaXiao(stats.size),
+                                mtime:this.getRiQi(stats.mtimeMs)})
                 }else{
-                    list.push({file_path:ab_path, url_path:url_path+'/'+item, file_name:item, isDirectory:false})
+                    list.push({file_path:ab_path, url_path:url_path+'/'+item, file_name:item,
+                                isDirectory:false,
+                                size:this.getWenJianDaXiao(stats.size),
+                                mtime:this.getRiQi(stats.mtimeMs)})
                 }
             })
         }
@@ -106,6 +112,52 @@ class WenJianMoKuai {
             }
         }
         return ext;
+    }
+
+    /**
+     * 传入文件大小（字节）  返回文件大小
+     */
+    getWenJianDaXiao(byteSize) {
+        if (!Number.isNaN(byteSize)) {
+            if (byteSize === 0) {
+                return "";
+            }else if (byteSize < 1024) {
+                return byteSize + "b";
+            } else if (byteSize < 1024 * 1024) {
+                return (byteSize / 1024).toFixed(2) + "KB";
+            } else if (byteSize < 1024 * 1024 * 1024) {
+                return (byteSize / 1024 / 1024).toFixed(2) + "MB";
+            } else {
+                return (byteSize / 1024 / 1024 / 1024).toFixed(2) + "GB";
+            }
+        }
+        return "";
+    }
+
+    /**
+     * 传入时间（纯数字）  返回日期
+     */
+    getRiQi(timestamp){
+        let d = new Date(timestamp);
+        let date = (d.getFullYear()) + "-" +
+            (this.getBuLing(d.getMonth() + 1,2)) + "-" +
+            (this.getBuLing(d.getDate(),2)) + " " +
+            (this.getBuLing(d.getHours(),2)) + ":" +
+            (this.getBuLing(d.getMinutes(),2)) + ":" +
+            (this.getBuLing(d.getSeconds()));
+        return date;
+    }
+
+    /**
+     * 格式化 长度不够前面补0
+     */
+    getBuLing(number, changdu) {
+        var len = number.toString().length;
+        while(len < changdu) {
+            number = "0" + number;
+            len++;
+        }
+        return number;
     }
 }
 
