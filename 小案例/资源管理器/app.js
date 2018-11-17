@@ -8,12 +8,12 @@ var jszip = require("./public/jszip");
 
 http
     .createServer(function (req, res) {
-        console.log('req.url:',req.url)
-        console.log('querystring.parse',querystring.parse(req.url))
+        // console.log('req.url:',req.url)
+        // console.log('querystring.parse',querystring.parse(req.url))
         var parseObj = url.parse(req.url, true);
         var url_path = parseObj.pathname;
         var obj_query = parseObj.query;
-        console.log('obj_query',obj_query)
+        // console.log('obj_query',obj_query)
 
         if (url_path === '/') {
             fs.readFile('./views/files.html', function (err, data) {
@@ -39,8 +39,8 @@ http
 
             if (WenJianMoKuai.getShiFouWenJianJia(file_path)) {
                 if(obj_query.download === "yes"){
-                    let obj_zip = WenJianMoKuai.zipWenJianJia(file_path)
-                    console.log('kaishixiazai:')
+                    let obj_zip = WenJianMoKuai.zipWenJianJia(file_path);
+                    console.log('kaishixiazai:');
                     res.writeHead(200, {
                         'Content-Type': 'application/octet-stream;charset=utf8',
                         'Content-Disposition': 'attachment; filename*="utf8\'\'' + obj_zip.zip_name + '.zip"'
@@ -62,7 +62,7 @@ http
                 }
 
             } else {
-                console.log('jszip')
+                console.log('jszip');
                 var f = fs.createReadStream(file_path);
                 let arr = file_path.split('/');
                 file_name = encodeURI(arr[arr.length - 1]);
@@ -72,6 +72,37 @@ http
                 });
                 f.pipe(res);
             }
+        } else if (url_path.indexOf('/upload') === 0) {
+            console.log('start-------------upload---------------------------------------');
+            //设置二进制编码
+            req.setEncoding('binary');
+            var postData = '';
+            req.on('data', function (chunk) {
+                postData += chunk;
+            });
+            req.on('end', function () {
+                //请求头的boundary
+                let boundary = querystring.parse(req.headers['content-type'], '; ', '=').boundary;
+                //分析后返回文件和自定义数据的对象
+                // data_obj: { url: '/files/03-JavaScript-高级-第1天/04源代码/.idea',
+                //     parent_url: '/files/03-JavaScript-高级-第1天/04源代码',
+                //     file_name: '新建文本文档.txt',
+                //     file_data: '111' }
+                let data_obj = WenJianMoKuai.getPostFenXi(postData, boundary);
+                // console.log('data_obj:',data_obj)
+                let write_path = getconfig().directory + data_obj.url.substring(6);
+                write_path = WenJianMoKuai.getJueDuiLuJing(write_path);
+
+                console.log('write_path:', write_path);
+                //写入
+                let fsw = fs.createWriteStream(write_path + '/' + data_obj.file_name);
+                fsw.write(data_obj.file_data, 'binary');
+                fsw.end();
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                console.log('end-------------upload---------------------------------------');
+                res.end(JSON.stringify({file_name: data_obj.file_name, size: data_obj.file_data.length}))
+            })
+
         } else {
             fs.readFile('./views/404.html', function (err, data) {
                 if (err) {

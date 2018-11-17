@@ -5,6 +5,7 @@ var fs = require("fs");
 var path = require("path");
 var getconfig = require("./getconfig");
 var jszip = require("./public/jszip");
+var querystring = require("querystring");
 
 class WenJianMoKuai {
     /**
@@ -15,26 +16,26 @@ class WenJianMoKuai {
             let ab_path = this.getJueDuiLuJing(dir_path);
             let zip_name = path.basename(dir_path);
 
-            console.log('dir_path', dir_path)
-            console.log('ab_path', ab_path)
-            console.log('zip_name',zip_name)
+            console.log('dir_path', dir_path);
+            console.log('ab_path', ab_path);
+            console.log('zip_name', zip_name);
 
-            var zip = new jszip()
-            zip.folder(zip_name)
+            var zip = new jszip();
+            zip.folder(zip_name);
 
             var ziWenJianJia = function(ab_path,zip_name,zip) {
-                var list = fs.readdirSync(ab_path)
+                var list = fs.readdirSync(ab_path);
                 list.forEach(function(item) {
-                    var new_ab_path = path.join(ab_path, item)
-                    var st = fs.statSync(new_ab_path)
+                    var new_ab_path = path.join(ab_path, item);
+                    var st = fs.statSync(new_ab_path);
                     if (!st.isDirectory()) {
                         zip.file(zip_name+'/'+item, fs.readFileSync(new_ab_path))
                     } else{
                         ziWenJianJia(new_ab_path,zip_name+'/'+item, zip)
                     }
                 })
-            }
-            ziWenJianJia(ab_path,zip_name,zip)
+            };
+            ziWenJianJia(ab_path, zip_name, zip);
             // console.log(zip);
             return {zip_name:zip_name, zip:zip};
         }
@@ -55,7 +56,7 @@ class WenJianMoKuai {
                 if(stats.isDirectory()){
                     list.push({file_path:ab_path, url_path:url_path+'/'+item, file_name:item,
                                 isDirectory:true,
-                                size:this.getWenJianDaXiao(stats.size),
+                        size: "",
                                 mtime:this.getRiQi(stats.mtimeMs)})
                 }else{
                     list.push({file_path:ab_path, url_path:url_path+'/'+item, file_name:item,
@@ -158,6 +159,54 @@ class WenJianMoKuai {
             len++;
         }
         return number;
+    }
+
+    /**
+     * data nodejs接收到的post数据
+     */
+    getPostFenXi(data, boundary) {
+        console.log('start.................getPostFenXi...................');
+        let data_obj = {};
+        //去掉头尾
+        let data_start = ('--' + boundary + '\r\n').length;
+        let data_end = data.indexOf('\r\n--' + boundary + '--');
+        let new_data = data.slice(data_start, data_end);
+        //分割
+        let chunk = new_data.split('\r\n--' + boundary + '\r\n');
+        // console.log('chunk: ',chunk)
+        for (let i = 0; i < chunk.length; i++) {
+            let subchunk = chunk[i].split('\r\n\r\n');
+            //中文名字需要转换编码
+            let buf = Buffer.from(subchunk[0], 'binary').toString("utf8");
+            let tmp = buf.match(/Content-Disposition: form-data; name=\"attachments\[\]\"; filename=\"(.*)\"/i);
+            if (tmp) {
+                //附件
+                data_obj['file_name'] = tmp[1];
+                data_obj['file_data'] = subchunk[1]
+            } else {
+                //自定义数据
+                tmp = buf.match(/Content-Disposition: form-data; name=\"(.*)\"/i);
+                let s = tmp[1];
+                data_obj[s] = Buffer.from(subchunk[1], 'binary').toString("utf8");
+            }
+            //
+            // -----------------------------2292431121424
+            // Content-Disposition: form-data; name="url"
+            //
+            //     /files
+            // -----------------------------2292431121424
+            // Content-Disposition: form-data; name="parent_url"
+            //
+            // 0
+            // -----------------------------2292431121424
+            // Content-Disposition: form-data; name="attachments[]"; filename="新建文本文档 (2).txt"
+            // Content-Type: text/plain
+            //
+            // 2222
+            // -----------------------------2292431121424--
+        }
+        console.log('end.................getPostFenXi...................');
+        return data_obj;
     }
 }
 

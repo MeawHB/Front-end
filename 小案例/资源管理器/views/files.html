@@ -5,9 +5,35 @@
     <title>Title</title>
     <link rel="stylesheet" href="../public/bootstrap.css">
     <script src="../public/jquery-3.3.1.js"></script>
+    <!--上传插件-->
+    <script src="../public/jqueryfileupload/vendor/jquery.ui.widget.js"></script>
+    <script src="../public/jqueryfileupload/jquery.iframe-transport.js"></script>
+    <script src="../public/jqueryfileupload/jquery.fileupload.js"></script>
+    <style type="text/css">
+        #dropZone {
+            border: 3px dashed #0088cc;
+            padding: 50px;
+            width: 500px;
+            margin-top: 20px;
+            background-color: #e0f2f1;
+        }
+
+        #files {
+            border: 10px dotted #0088cc;
+            padding: 20px;
+            width: 200px;
+            /*display: none;*/
+            /*background-color: #f9a825;*/
+        }
+
+        #error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
 <div class="col-md-12">
+    <!--目录列表-->
     <div class="col-md-12">
         <ol id="ol" class="breadcrumb" style="font-size: 20px;">
             <!--<li><a href="#">Home</a></li>-->
@@ -15,6 +41,7 @@
             <!--<li class="active">Data</li>-->
         </ol>
     </div>
+    <!--文件列表-->
     <div class="col-md-7">
         <table class="table table-hover">
             <thead>
@@ -31,6 +58,22 @@
             </tbody>
         </table>
     </div>
+    <!--上传-->
+    <div class="col-md-5">
+        <div id="dropZone">
+            <h1>Drag & Drop Files...</h1>
+            <input type="file" id="fileupload" name="attachments[]" multiple>
+        </div>
+        <h1 id="error"></h1><br><br>
+        <h1 id="progress"></h1><br><br>
+        <div id="files"></div>
+    </div>
+    <!--<div>-->
+    <!--<form action="/upload" method=post enctype="multipart/form-data" accept-charset="utf-8">-->
+    <!--<input type="file" id="data" name="data" />-->
+    <!--<input type="submit" value="上传" id="sub"/>-->
+    <!--</form>-->
+    <!--</div>-->
 </div>
 <script>
     /**
@@ -66,12 +109,14 @@
             });
             if (flag_muLuChuLi) {
                 list_url = list_url.slice(0, list_length + 1);
+                temp_url = {url: list_url[list_length].url, parent_url: list_url[list_length].parent_url};
             } else {
                 temp_url = {url: url, parent_url: temp_url.url};
                 list_url.push(temp_url);
             }
         }
         console.log('list_url:', list_url);
+        console.log('temp_url:', temp_url);
         $('#ol').empty();
         $.each(list_url, function (index, item) {
             let temp = item.url.split('/');
@@ -108,6 +153,7 @@
                 ajax_result = result;
                 muLuChuLi(url);
                 wenJianChuLi(result);
+
             }
         });
     }
@@ -133,7 +179,7 @@
         e.preventDefault();
         let url_path = $(this).attr("href");
         getfilelist(url_path);
-    })
+    });
 
     // flag排序用
     var flag = true;
@@ -163,7 +209,7 @@
             }
             wenJianChuLi(ajax_result);
         }
-    })
+    });
 
     // 按文件名排序
     $('#file_name').on('click',function () {
@@ -190,7 +236,7 @@
             }
             wenJianChuLi(ajax_result);
         }
-    })
+    });
 
     // 按文件大小排序
     $('#size').on('click',function () {
@@ -217,7 +263,38 @@
             }
             wenJianChuLi(ajax_result);
         }
-    })
+    });
+
+    //jquery file upload 上传
+    var files = $("#files");
+
+    $("#fileupload").fileupload({
+        url: '/upload',
+        dropZone: '#dropZone',
+        dataType: 'json',
+        autoUpload: false,
+    }).on('fileuploadadd', function (e, data) {
+        //上传自定义对象数据
+        data.formData = temp_url;
+        console.log('temp_url ', temp_url);
+        console.log('name:', data.files[0].name, '     size:', data.files[0].size);
+        data.submit();
+
+    }).on('fileuploaddone', function (e, data) {
+        getfilelist(temp_url.url);
+
+        var status = data.jqXHR.responseJSON.status;
+        var msg = data.jqXHR.responseJSON.msg;
+
+        if (status == 1) {
+            var path = data.jqXHR.responseJSON.path;
+            $("#files").fadeIn().append('<p><img style="width: 100px; height: 100px;" src="' + path + '" /></p>');
+        } else
+            $("#error").html(msg);
+    }).on('fileuploadprogressall', function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $("#progress").html("Completed: " + progress + "%");
+    });
 </script>
 </body>
 </html>
