@@ -3,7 +3,6 @@
  */
 var fs = require("fs");
 var path = require("path");
-var getconfig = require("./getconfig");
 var jszip = require("./public/jszip");
 var querystring = require("querystring");
 

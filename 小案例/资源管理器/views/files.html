@@ -18,13 +18,13 @@
             background-color: #e0f2f1;
         }
 
-        #files {
-            border: 10px dotted #0088cc;
-            padding: 20px;
-            width: 200px;
-            /*display: none;*/
-            /*background-color: #f9a825;*/
-        }
+        /*#files {*/
+            /*border: 10px dotted #0088cc;*/
+            /*padding: 20px;*/
+            /*width: 200px;*/
+            /*!*display: none;*!*/
+            /*!*background-color: #f9a825;*!*/
+        /*}*/
 
         #error {
             color: red;
@@ -32,7 +32,7 @@
     </style>
 </head>
 <body>
-<div class="col-md-12">
+<div class="col-md-12 container-fluid">
     <!--目录列表-->
     <div class="col-md-12">
         <ol id="ol" class="breadcrumb" style="font-size: 20px;">
@@ -46,7 +46,7 @@
         <table class="table table-hover">
             <thead>
             <tr>
-                <td class="col-md-3" id="file_name">文件名</td>
+                <td class="col-md-2" id="file_name">文件名</td>
                 <td class="col-md-2" id="mtime">上次修改时间</td>
                 <td class="col-md-1" id="size">大小</td>
                 <td class="col-md-1">打开</td>
@@ -60,13 +60,14 @@
     </div>
     <!--上传-->
     <div class="col-md-5">
+        <button id="zhedie" class="btn btn-info">折叠</button>
         <div id="dropZone">
             <h1>Drag & Drop Files...</h1>
             <input type="file" id="fileupload" name="attachments[]" multiple>
         </div>
         <h1 id="error"></h1><br><br>
         <h1 id="progress"></h1><br><br>
-        <div id="files"></div>
+        <!--<div id="files"></div>-->
     </div>
     <!--<div>-->
     <!--<form action="/upload" method=post enctype="multipart/form-data" accept-charset="utf-8">-->
@@ -74,6 +75,9 @@
     <!--<input type="submit" value="上传" id="sub"/>-->
     <!--</form>-->
     <!--</div>-->
+    <div class="col-md-12" id="img">
+
+    </div>
 </div>
 <script>
     /**
@@ -139,6 +143,20 @@
                                     <td></td><td><a href="${value.url_path}" isdir="no">下载</a></td></tr>`;
             }
             $('#tbody').append(trhtml);
+        });
+
+        $('#img').empty();
+        $.each(result, function (index, value) {
+            let img = /\S*\.(png|jpeg|jpg|bmp)/i;
+            let imghtml = ""
+            if(value.file_name.match(img)){
+                console.log('----------------------------------')
+                imghtml = `<div class="col-md-2"><img src="/img${value.url_path}" class="img-responsive img-rounded"></div>`
+                if( ( (index+1) %6 ) === 0){
+                    imghtml = imghtml + `<div class="row"></div><br/><div class="row"></div>`
+                }
+            }
+            $('#img').append(imghtml);
         });
     }
 
@@ -286,15 +304,22 @@
         var status = data.jqXHR.responseJSON.status;
         var msg = data.jqXHR.responseJSON.msg;
 
+        /**
         if (status == 1) {
             var path = data.jqXHR.responseJSON.path;
             $("#files").fadeIn().append('<p><img style="width: 100px; height: 100px;" src="' + path + '" /></p>');
         } else
             $("#error").html(msg);
+         */
     }).on('fileuploadprogressall', function (e, data) {
         var progress = parseInt(data.loaded / data.total * 100, 10);
         $("#progress").html("Completed: " + progress + "%");
     });
+
+    $("#zhedie").click(function(){
+        $("#tbody").fadeToggle();
+    });
+
 </script>
 </body>
 </html>

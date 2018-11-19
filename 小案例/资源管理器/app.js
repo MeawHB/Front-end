@@ -3,7 +3,7 @@ var fs = require('fs');
 var url = require('url');
 var querystring = require('querystring');
 var WenJianMoKuai = require("./WenJianMoKuai");
-var getconfig = require("./getconfig");
+var config = require("./config");
 var jszip = require("./public/jszip");
 
 http
@@ -30,7 +30,7 @@ http
                 res.end(data)
             })
         } else if (url_path.indexOf('/files') === 0) {
-            let file_path = getconfig().directory + url_path.substring(6);
+            let file_path = config.directory + url_path.substring(6);
             console.log('请求文件路径: ', file_path);
             file_path = decodeURI(file_path);   //中文乱码解码
             url_path = decodeURI(url_path);
@@ -90,7 +90,7 @@ http
                 //     file_data: '111' }
                 let data_obj = WenJianMoKuai.getPostFenXi(postData, boundary);
                 // console.log('data_obj:',data_obj)
-                let write_path = getconfig().directory + data_obj.url.substring(6);
+                let write_path = config.directory + data_obj.url.substring(6);
                 write_path = WenJianMoKuai.getJueDuiLuJing(write_path);
 
                 console.log('write_path:', write_path);
@@ -103,6 +103,18 @@ http
                 res.end(JSON.stringify({file_name: data_obj.file_name, size: data_obj.file_data.length}))
             })
 
+        } else if (url_path.indexOf('/img') === 0) {
+            let file_path = config.directory + url_path.substring(10);
+            console.log('请求文件路径: ', file_path);
+            file_path = decodeURI(file_path);   //中文乱码解码
+            // fs.readFile(file_path, function (err, data) {
+            //     if (err) {
+            //         return res.end('404 Not Found.')
+            //     }
+            //     res.end(data)
+            // })
+            fs.createReadStream(file_path).pipe(res);
+
         } else {
             fs.readFile('./views/404.html', function (err, data) {
                 if (err) {
@@ -112,7 +124,7 @@ http
             })
         }
     })
-    .listen(getconfig().port, function () {
+    .listen(config.port, function () {
         console.log('running...')
     });
 

@@ -1,7 +1,7 @@
 var path = require("path");
 var fs = require("fs");
 var WenJianMoKuai = require("./WenJianMoKuai");
-var getconfig = require("./getconfig");
+var getconfig = require("./config");
 
 url = "http://127.0.0.1/index.html?a=1&&b=2"
 
