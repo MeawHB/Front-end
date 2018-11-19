@@ -89,7 +89,8 @@
      * list_url 存放目录列表 muLuChuLi用
      * list_length 目录列表长度
      */
-    var root_url = "/files";
+    var root_name = "Server"
+    var root_url = "/getjson";
     var ajax_result = null;
     var temp_url = null;
     var list_url = [];
@@ -128,7 +129,11 @@
         $.each(list_url, function (index, item) {
             let temp = item.url.split('/');
             temp = temp[temp.length - 1];
-            $('#ol').append(`<li><a href="${item.url}" isdir=yes>${temp}</a></li>`)
+            if(index===0){
+                $('#ol').append(`<li><a href="${item.url}" isdir=yes>${root_name}</a></li>`)
+            }else{
+                $('#ol').append(`<li><a href="${item.url}" isdir=yes>${temp}</a></li>`)
+            }
         });
     }
 
@@ -136,14 +141,16 @@
     function wenJianChuLi(result) {
         $('#tbody').empty();
         $.each(result, function (index, value) {
+            //去掉第一层路径，加上download路径
+            let tmp_path = getJieQuUrlPath(value.url_path)
             trhtml = `<tr><td>${value.file_name}</td>`;
             if (value.isDirectory) {
                 trhtml = trhtml + `<td>${value.mtime}</td><td>${value.size}</td>
-                                   <td><a href="${value.url_path}" isdir="yes">进入</a></td>
-                                   <td><a href="${value.url_path}?download=yes" isdownload="yes" isdir="yes">下载</a></td></tr>`;
+                                   <td><a href="/getjson${tmp_path}" isdir="yes">进入</a></td>
+                                   <td><a href="/downloaddir${tmp_path}?download=yes" isdownload="yes" isdir="yes">下载</a></td></tr>`;
             } else {
                 trhtml = trhtml + `<td>${value.mtime}</td><td>${value.size}</td>
-                                    <td></td><td><a href="${value.url_path}" isdir="no">下载</a></td></tr>`;
+                                    <td></td><td><a href="/downloadfile${tmp_path}" isdir="no">下载</a></td></tr>`;
             }
             $('#tbody').append(trhtml);
         });
@@ -153,7 +160,9 @@
             let img = /\S*\.(png|jpeg|jpg|bmp)/i;
             let imghtml = ""
             if(value.file_name.match(img)){
-                imghtml = `<img data-src="img${value.url_path}" class="col-md-2 lazyload img-responsive img-rounded">`
+                //去掉第一层路径，加上img路径
+                let tmp_path = getJieQuUrlPath(value.url_path)
+                imghtml = `<img data-src="img${tmp_path}" class="col-md-2 lazyload img-responsive img-rounded">`
                 if( ( (index+1) %6 ) === 0){
                     imghtml = imghtml + `<div class="row"></div><br/><div class="row"></div>`
                 }
@@ -324,6 +333,15 @@
         $("#tbody").fadeToggle();
     });
 
+    function getJieQuUrlPath(url_path){
+        let tmp_path = url_path.replace('/','-');
+        let index = tmp_path.indexOf('/')
+        if(index === -1){
+            return ""
+        }else{
+            return tmp_path.substring(index)
+        }
+    }
 </script>
 </body>
 </html>

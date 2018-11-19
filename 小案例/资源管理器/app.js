@@ -29,49 +29,93 @@ http
                 }
                 res.end(data)
             })
-        } else if (url_path.indexOf('/files') === 0) {
-            let file_path = config.directory + url_path.substring(6);
-            console.log('请求文件路径: ', file_path);
+        }
+        // else if (url_path.indexOf('/Server') === 0) {
+        //     let file_path = config.directory + WenJianMoKuai.getJieQuUrlPath(url_path);
+        //     console.log('请求文件路径: ', file_path);
+        //     file_path = decodeURI(file_path);   //中文乱码解码
+        //     url_path = decodeURI(url_path);
+        //     console.log('请求文件路径decodeURI: ', file_path);
+        //     console.log('请求文件是否文件夹: ', WenJianMoKuai.getShiFouWenJianJia(file_path));
+        //
+        //     if (WenJianMoKuai.getShiFouWenJianJia(file_path)) {
+        //         if(obj_query.download === "yes"){
+        //             // let obj_zip = WenJianMoKuai.zipWenJianJia(file_path);
+        //             // console.log('kaishixiazai:');
+        //             // res.writeHead(200, {
+        //             //     'Content-Type': 'application/octet-stream;charset=utf8',
+        //             //     'Content-Disposition': 'attachment; filename*="utf8\'\'' + obj_zip.zip_name + '.zip"'
+        //             // });
+        //             // obj_zip.zip.generateNodeStream({ streamFile: true })
+        //             //     .pipe(res)
+        //             //     .on('finish', function() {
+        //             //         res.end();
+        //             //     });
+        //         }else{
+        //             // var filelist = WenJianMoKuai.getWenJianJia(url_path, file_path);
+        //             // // console.log(filelist)
+        //             // res.writeHead(200, {
+        //             //     "Content-Type": 'application/json',
+        //             //     'charset': 'utf-8', 'Access-Control-Allow-Origin': '*',
+        //             //     'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS'
+        //             // });
+        //             // res.end(JSON.stringify(filelist))
+        //         }
+        //     } else {
+        //         // console.log('jszip');
+        //         // var f = fs.createReadStream(file_path);
+        //         // let arr = file_path.split('/');
+        //         // file_name = encodeURI(arr[arr.length - 1]);
+        //         // res.writeHead(200, {
+        //         //     'Content-Type': 'application/octet-stream;charset=utf8',
+        //         //     'Content-Disposition': 'attachment; filename*="utf8\'\'' + file_name + '"'
+        //         // });
+        //         // f.pipe(res);
+        //     }
+        // }
+        else if (url_path.indexOf('/getjson') === 0) {
+            let file_path = config.directory + WenJianMoKuai.getJieQuUrlPath(url_path);
             file_path = decodeURI(file_path);   //中文乱码解码
             url_path = decodeURI(url_path);
             console.log('请求文件路径decodeURI: ', file_path);
-            console.log('请求文件是否文件夹: ', WenJianMoKuai.getShiFouWenJianJia(file_path));
-
-            if (WenJianMoKuai.getShiFouWenJianJia(file_path)) {
-                if(obj_query.download === "yes"){
-                    let obj_zip = WenJianMoKuai.zipWenJianJia(file_path);
-                    console.log('kaishixiazai:');
-                    res.writeHead(200, {
-                        'Content-Type': 'application/octet-stream;charset=utf8',
-                        'Content-Disposition': 'attachment; filename*="utf8\'\'' + obj_zip.zip_name + '.zip"'
-                    });
-                    obj_zip.zip.generateNodeStream({ streamFile: true })
-                        .pipe(res)
-                        .on('finish', function() {
-                            res.end();
-                        });
-                }else{
-                    var filelist = WenJianMoKuai.getWenJianJia(url_path, file_path);
-                    // console.log(filelist)
-                    res.writeHead(200, {
-                        "Content-Type": 'application/json',
-                        'charset': 'utf-8', 'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS'
-                    });
-                    res.end(JSON.stringify(filelist))
-                }
-
-            } else {
-                console.log('jszip');
-                var f = fs.createReadStream(file_path);
-                let arr = file_path.split('/');
-                file_name = encodeURI(arr[arr.length - 1]);
-                res.writeHead(200, {
-                    'Content-Type': 'application/octet-stream;charset=utf8',
-                    'Content-Disposition': 'attachment; filename*="utf8\'\'' + file_name + '"'
+            var filelist = WenJianMoKuai.getWenJianJia(url_path, file_path);
+            res.writeHead(200, {
+                "Content-Type": 'application/json',
+                'charset': 'utf-8', 'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS'
+            });
+            res.end(JSON.stringify(filelist))
+        } else if (url_path.indexOf('/downloadfile') === 0) {
+            console.log('start downloadfile');
+            let file_path = config.directory + WenJianMoKuai.getJieQuUrlPath(url_path);
+            console.log('下载文件路径: ', file_path);
+            file_path = decodeURI(file_path);   //中文乱码解码
+            var f = fs.createReadStream(file_path);
+            let arr = file_path.split('/');
+            file_name = encodeURI(arr[arr.length - 1]);
+            res.writeHead(200, {
+                'Content-Type': 'application/octet-stream;charset=utf8',
+                'Content-Disposition': 'attachment; filename*="utf8\'\'' + file_name + '"'
+            });
+            console.log('end downloadfile');
+            f.pipe(res);
+        } else if (url_path.indexOf('/downloaddir') === 0) {
+            console.log('start  downloaddir');
+            let file_path = config.directory + WenJianMoKuai.getJieQuUrlPath(url_path);
+            file_path = decodeURI(file_path);   //中文乱码解码
+            console.log('请求文件路径decodeURI: ', file_path);
+            let obj_zip = WenJianMoKuai.zipWenJianJia(file_path);
+            res.writeHead(200, {
+                'Content-Type': 'application/octet-stream;charset=utf8',
+                'Content-Disposition': 'attachment; filename*="utf8\'\'' + obj_zip.zip_name + '.zip"'
+            });
+            console.log('end  downloaddir');
+            obj_zip.zip.generateNodeStream({ streamFile: true })
+                .pipe(res)
+                .on('finish', function() {
+                    res.end();
                 });
-                f.pipe(res);
-            }
+
         } else if (url_path.indexOf('/upload') === 0) {
             console.log('start-------------upload---------------------------------------');
             //设置二进制编码
@@ -90,7 +134,7 @@ http
                 //     file_data: '111' }
                 let data_obj = WenJianMoKuai.getPostFenXi(postData, boundary);
                 // console.log('data_obj:',data_obj)
-                let write_path = config.directory + data_obj.url.substring(6);
+                let write_path = config.directory + WenJianMoKuai.getJieQuUrlPath(data_obj.url);
                 write_path = WenJianMoKuai.getJueDuiLuJing(write_path);
 
                 console.log('write_path:', write_path);
@@ -104,15 +148,9 @@ http
             })
 
         } else if (url_path.indexOf('/img') === 0) {
-            let file_path = config.directory + url_path.substring(10);
+            let file_path = config.directory + WenJianMoKuai.getJieQuUrlPath(url_path);
             console.log('请求文件路径: ', file_path);
             file_path = decodeURI(file_path);   //中文乱码解码
-            // fs.readFile(file_path, function (err, data) {
-            //     if (err) {
-            //         return res.end('404 Not Found.')
-            //     }
-            //     res.end(data)
-            // })
             fs.createReadStream(file_path).pipe(res);
 
         } else {

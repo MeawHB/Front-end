@@ -144,7 +144,7 @@ class WenJianMoKuai {
             (this.getBuLing(d.getDate(),2)) + " " +
             (this.getBuLing(d.getHours(),2)) + ":" +
             (this.getBuLing(d.getMinutes(),2)) + ":" +
-            (this.getBuLing(d.getSeconds()));
+            (this.getBuLing(d.getSeconds(),2));
         return date;
     }
 
@@ -206,6 +206,19 @@ class WenJianMoKuai {
         }
         console.log('end.................getPostFenXi...................');
         return data_obj;
+    }
+
+    /**
+     * 返回第二个 / 开始的内容 如果没有第二个 返回空
+     */
+    getJieQuUrlPath(url_path){
+        let tmp_path = url_path.replace('/','-');
+        let index = tmp_path.indexOf('/')
+        if(index === -1){
+            return ""
+        }else{
+            return tmp_path.substring(index)
+        }
     }
 }
 
