@@ -5,6 +5,8 @@
     <title>Title</title>
     <link rel="stylesheet" href="../public/bootstrap.css">
     <script src="../public/jquery-3.3.1.js"></script>
+    <!--懒加载-->
+    <script src="../public/lazyload.js"></script>
     <!--上传插件-->
     <script src="../public/jqueryfileupload/vendor/jquery.ui.widget.js"></script>
     <script src="../public/jqueryfileupload/jquery.iframe-transport.js"></script>
@@ -79,6 +81,7 @@
 
     </div>
 </div>
+
 <script>
     /**
      * ajax_result 每次获取的结果存入ajax_result    排序用
@@ -150,14 +153,15 @@
             let img = /\S*\.(png|jpeg|jpg|bmp)/i;
             let imghtml = ""
             if(value.file_name.match(img)){
-                console.log('----------------------------------')
-                imghtml = `<div class="col-md-2"><img src="/img${value.url_path}" class="img-responsive img-rounded"></div>`
+                imghtml = `<img data-src="img${value.url_path}" class="col-md-2 lazyload img-responsive img-rounded">`
                 if( ( (index+1) %6 ) === 0){
                     imghtml = imghtml + `<div class="row"></div><br/><div class="row"></div>`
                 }
             }
             $('#img').append(imghtml);
         });
+        //懒加载
+        $("img.lazyload").lazyload();
     }
 
     // 请求服务器获取文件夹内文件列表并显示
@@ -171,7 +175,6 @@
                 ajax_result = result;
                 muLuChuLi(url);
                 wenJianChuLi(result);
-
             }
         });
     }
@@ -316,6 +319,7 @@
         $("#progress").html("Completed: " + progress + "%");
     });
 
+    //折叠文件列表
     $("#zhedie").click(function(){
         $("#tbody").fadeToggle();
     });
