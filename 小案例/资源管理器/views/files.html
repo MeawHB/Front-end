@@ -44,8 +44,8 @@
         </ol>
     </div>
     <!--文件列表-->
-    <div class="col-md-7">
-        <table class="table table-hover">
+    <div class="col-md-7" id="filearea">
+        <table class="table table-hover" id="table">
             <thead>
             <tr>
                 <td class="col-md-2" id="file_name">文件名</td>
@@ -63,6 +63,8 @@
     <!--上传-->
     <div class="col-md-5">
         <button id="zhedie" class="btn btn-info">折叠</button>
+        <button id="tubiao" class="btn btn-info">图标显示</button>
+        <button id="liebiao" class="btn btn-info">列表显示</button>
         <div id="dropZone">
             <h1>Drag & Drop Files...</h1>
             <input type="file" id="fileupload" name="attachments[]" multiple>
@@ -84,10 +86,12 @@
 
 <script>
     /**
+     * root_name 根目录名称
      * ajax_result 每次获取的结果存入ajax_result    排序用
      * temp_url 每次访问的地址存入temp_url     muLuChuLi用
      * list_url 存放目录列表 muLuChuLi用
      * list_length 目录列表长度
+     * fileareahtml 文件显示区域内html
      */
     var root_name = "Server"
     var root_url = "/getjson";
@@ -95,6 +99,8 @@
     var temp_url = null;
     var list_url = [];
     var list_length = 0;
+    var fileareahtml = $("#filearea").html();
+    var show_style = 0;
 
     // 目录列表处理并显示
     function muLuChuLi(url) {
@@ -139,6 +145,7 @@
 
     // 根据获取到的文件列表处理并显示  result为ajax返回结果（json对象）
     function wenJianChuLi(result) {
+        $("#filearea").html(fileareahtml);
         $('#tbody').empty();
         $.each(result, function (index, value) {
             //去掉第一层路径，加上download路径
@@ -173,6 +180,30 @@
         $("img.lazyload").lazyload();
     }
 
+    //图标方式显示
+    function tuBiaoXianShi(result) {
+        $('#filearea').empty();
+        let dirhtml = "";
+        let filehtml = "";
+        $.each(result, function (index, value) {
+            //去掉第一层路径，加上download路径path)
+            let tmp_path = getJieQuUrlPath(value.url_path)
+            if (value.isDirectory) {
+                dirhtml = dirhtml + `<div class="col-md-2" style="height: 160px">
+                                    <img src="../public/img/wenjianjia.png" alt="">
+                                    <p>${value.file_name}</p>
+                                    <a href="/getjson${tmp_path}" isdir="yes">进入</a>
+                                    <a href="/downloaddir${tmp_path}?download=yes" isdownload="yes" isdir="yes">下载</a></div>`;
+            } else {
+                filehtml = filehtml+ `<div class="col-md-2" style="height: 160px">
+                                    <img src="../public/img/wenjian.png" alt="">
+                                    <p>${value.file_name}</p>
+                                    <a href="/downloadfile${tmp_path}" isdir="no">下载</a></div>`;
+            }
+            $('#filearea').html(dirhtml+filehtml);
+        });
+    }
+
     // 请求服务器获取文件夹内文件列表并显示
     function getfilelist(url) {
         $.ajax({
@@ -183,7 +214,14 @@
                 console.log('ajax----result: ', result);
                 ajax_result = result;
                 muLuChuLi(url);
-                wenJianChuLi(result);
+                // $("#filearea").html(fileareahtml);
+                // wenJianChuLi(result);
+                if(show_style === 0){
+                    wenJianChuLi(result);
+                }
+                if(show_style === 1){
+                    tuBiaoXianShi(result)
+                }
             }
         });
     }
@@ -191,7 +229,7 @@
     getfilelist(root_url);
 
     // 文件夹打开、下载
-    $('#tbody').on('click', 'a', function (e) {
+    $('#filearea').on('click', 'a', function (e) {
         // let url_path = $(this).parent().parent().children().first().text();
         let url_path = $(this).attr("href");
         if ($(this).attr('isdir') === "yes") {
@@ -297,7 +335,6 @@
 
     //jquery file upload 上传
     var files = $("#files");
-
     $("#fileupload").fileupload({
         url: '/upload',
         dropZone: '#dropZone',
@@ -312,7 +349,6 @@
 
     }).on('fileuploaddone', function (e, data) {
         getfilelist(temp_url.url);
-
         var status = data.jqXHR.responseJSON.status;
         var msg = data.jqXHR.responseJSON.msg;
 
@@ -328,11 +364,31 @@
         $("#progress").html("Completed: " + progress + "%");
     });
 
-    //折叠文件列表
+    //折叠文件列表，文字切换
+    let zhedie_flag = true;
     $("#zhedie").click(function(){
-        $("#tbody").fadeToggle();
+        if(zhedie_flag){
+            $("#zhedie").text("展开");
+        }else{
+            $("#zhedie").text("折叠");
+        }
+        zhedie_flag=!zhedie_flag
+        $("#filearea").fadeToggle();
     });
 
+    //列表显示
+    $("#liebiao").click(function(){
+        show_style = 0;
+        wenJianChuLi(ajax_result);
+    });
+
+    //图标显示
+    $("#tubiao").click(function(){
+        show_style = 1;
+        tuBiaoXianShi(ajax_result)
+    });
+
+    //去除第一层路径返回  传入/abc/efg 返回/efg 找不到返回""
     function getJieQuUrlPath(url_path){
         let tmp_path = url_path.replace('/','-');
         let index = tmp_path.indexOf('/')
