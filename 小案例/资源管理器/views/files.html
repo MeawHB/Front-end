@@ -196,6 +196,7 @@
                                     <a href="/getjson${tmp_path}" isdir="yes">进入</a>
                                     <a href="/downloaddir${tmp_path}?download=yes" isdownload="yes" isdir="yes">下载</a></div>`;
             } else {
+                //如果是图片显示图片的缩略图
                 let img = /\S*\.(png|jpeg|jpg|bmp)/i;
                 if(value.file_name.match(img)){
                     console.log(value.file_name.match(img))
