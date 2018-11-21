@@ -163,22 +163,22 @@
             $('#tbody').append(trhtml);
         });
 
-        $('#img').empty();
-        $.each(result, function (index, value) {
-            let img = /\S*\.(png|jpeg|jpg|bmp)/i;
-            let imghtml = ""
-            if(value.file_name.match(img)){
-                //去掉第一层路径，加上img路径
-                let tmp_path = getJieQuUrlPath(value.url_path)
-                imghtml = `<img data-src="img${tmp_path}" class="col-md-2 lazyload img-responsive img-rounded">`
-                if( ( (index+1) %6 ) === 0){
-                    imghtml = imghtml + `<div class="row"></div><br/><div class="row"></div>`
-                }
-            }
-            $('#img').append(imghtml);
-        });
-        //懒加载
-        $("img.lazyload").lazyload();
+        // $('#img').empty();
+        // $.each(result, function (index, value) {
+        //     let img = /\S*\.(png|jpeg|jpg|bmp)/i;
+        //     let imghtml = ""
+        //     if(value.file_name.match(img)){
+        //         //去掉第一层路径，加上img路径
+        //         let tmp_path = getJieQuUrlPath(value.url_path)
+        //         imghtml = `<img data-src="simg${tmp_path}" class="col-md-2 lazyload img-responsive img-rounded">`
+        //         if( ( (index+1) %6 ) === 0){
+        //             imghtml = imghtml + `<div class="row"></div><br/><div class="row"></div>`
+        //         }
+        //     }
+        //     $('#img').append(imghtml);
+        // });
+        // //懒加载
+        // $("#img img.lazyload").lazyload();
     }
 
     //图标方式显示
@@ -196,12 +196,23 @@
                                     <a href="/getjson${tmp_path}" isdir="yes">进入</a>
                                     <a href="/downloaddir${tmp_path}?download=yes" isdownload="yes" isdir="yes">下载</a></div>`;
             } else {
-                filehtml = filehtml+ `<div class="col-md-2" style="height: 160px">
+                let img = /\S*\.(png|jpeg|jpg|bmp)/i;
+                if(value.file_name.match(img)){
+                    console.log(value.file_name.match(img))
+                    filehtml = filehtml+ `<div class="col-md-2" style="height: 160px">
+                                    <img data-src="simg${tmp_path}" class="lazyload img-responsive img-rounded">
+                                    <p>${value.file_name}</p>
+                                    <a href="/downloadfile${tmp_path}" isdir="no">下载</a></div>`;
+                }else{
+                    filehtml = filehtml+ `<div class="col-md-2" style="height: 160px">
                                     <img src="../public/img/wenjian.png" alt="">
                                     <p>${value.file_name}</p>
                                     <a href="/downloadfile${tmp_path}" isdir="no">下载</a></div>`;
+                }
             }
             $('#filearea').html(dirhtml+filehtml);
+            //懒加载
+            $("#filearea img.lazyload").lazyload();
         });
     }
 

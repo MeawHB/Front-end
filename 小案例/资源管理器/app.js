@@ -1,18 +1,22 @@
 var http = require('http');
 var fs = require('fs');
+var path = require('path');
 var url = require('url');
 var querystring = require('querystring');
 var WenJianMoKuai = require("./WenJianMoKuai");
 var config = require("./config");
 var jszip = require("./public/jszip");
+var images = require("images");
 
 http
     .createServer(function (req, res) {
         // console.log('req.url:',req.url)
         // console.log('querystring.parse',querystring.parse(req.url))
         var parseObj = url.parse(req.url, true);
+        // console.log('parseObj', parseObj)
         var url_path = parseObj.pathname;
         var obj_query = parseObj.query;
+        // console.log('url_path',url_path)
         // console.log('obj_query',obj_query)
 
         if (url_path === '/') {
@@ -74,9 +78,10 @@ http
         //     }
         // }
         else if (url_path.indexOf('/getjson') === 0) {
-            let file_path = config.directory + WenJianMoKuai.getJieQuUrlPath(url_path);
+            let file_path = path.join(config.directory,WenJianMoKuai.getJieQuUrlPath(url_path));
             file_path = decodeURI(file_path);   //中文乱码解码
             url_path = decodeURI(url_path);
+            // console.log('de urlpath',decodeURI(url_path))
             console.log('请求文件路径decodeURI: ', file_path);
             var filelist = WenJianMoKuai.getWenJianJia(url_path, file_path);
             res.writeHead(200, {
@@ -87,11 +92,11 @@ http
             res.end(JSON.stringify(filelist))
         } else if (url_path.indexOf('/downloadfile') === 0) {
             console.log('start downloadfile');
-            let file_path = config.directory + WenJianMoKuai.getJieQuUrlPath(url_path);
-            console.log('下载文件路径: ', file_path);
+            let file_path = path.join(config.directory,WenJianMoKuai.getJieQuUrlPath(url_path));
             file_path = decodeURI(file_path);   //中文乱码解码
+            console.log('下载文件路径decodeURI: ', file_path);
             var f = fs.createReadStream(file_path);
-            let arr = file_path.split('/');
+            let arr = url_path.split('/');
             file_name = encodeURI(arr[arr.length - 1]);
             res.writeHead(200, {
                 'Content-Type': 'application/octet-stream;charset=utf8',
@@ -101,7 +106,7 @@ http
             f.pipe(res);
         } else if (url_path.indexOf('/downloaddir') === 0) {
             console.log('start  downloaddir');
-            let file_path = config.directory + WenJianMoKuai.getJieQuUrlPath(url_path);
+            let file_path = path.join(config.directory, WenJianMoKuai.getJieQuUrlPath(url_path));
             file_path = decodeURI(file_path);   //中文乱码解码
             console.log('请求文件路径decodeURI: ', file_path);
             let obj_zip = WenJianMoKuai.zipWenJianJia(file_path);
@@ -134,7 +139,7 @@ http
                 //     file_data: '111' }
                 let data_obj = WenJianMoKuai.getPostFenXi(postData, boundary);
                 // console.log('data_obj:',data_obj)
-                let write_path = config.directory + WenJianMoKuai.getJieQuUrlPath(data_obj.url);
+                let write_path = path.join(config.directory, WenJianMoKuai.getJieQuUrlPath(data_obj.url));
                 write_path = WenJianMoKuai.getJueDuiLuJing(write_path);
 
                 console.log('write_path:', write_path);
@@ -148,10 +153,31 @@ http
             })
 
         } else if (url_path.indexOf('/img') === 0) {
-            let file_path = config.directory + WenJianMoKuai.getJieQuUrlPath(url_path);
+            let file_path = path.join(config.directory, WenJianMoKuai.getJieQuUrlPath(url_path));
             console.log('请求文件路径: ', file_path);
             file_path = decodeURI(file_path);   //中文乱码解码
             fs.createReadStream(file_path).pipe(res);
+
+        } else if (url_path.indexOf('/simg') === 0) {
+            console.log('start simg-------------------')
+            let s_file_path = path.join(config.simg, WenJianMoKuai.getJieQuUrlPath(url_path));
+            let file_path = path.join(config.directory, WenJianMoKuai.getJieQuUrlPath(url_path));
+            file_path = decodeURI(file_path);
+            s_file_path = decodeURI(s_file_path);
+            console.log('请求文件路径: ', s_file_path);
+            //如果不存在，创建缩略图
+            if(fs.existsSync(s_file_path))
+            {
+            }else{
+                WenJianMoKuai.mkdirsSync(path.dirname(s_file_path))
+                images(file_path)
+                    .size(150)
+                    .save(s_file_path, {
+                        quality : 100
+                    });
+            }
+            console.log('end simg-------------------')
+            fs.createReadStream(s_file_path).pipe(res);
 
         } else {
             fs.readFile('./views/404.html', function (err, data) {

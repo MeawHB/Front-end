@@ -220,6 +220,20 @@ class WenJianMoKuai {
             return tmp_path.substring(index)
         }
     }
+
+    /**
+     * 递归创建目录,传入目录名
+     */
+    mkdirsSync(dirname) {
+        if (fs.existsSync(dirname)) {
+            return true;
+        } else {
+            if (this.mkdirsSync(path.dirname(dirname))) {
+                fs.mkdirSync(dirname);
+                return true;
+            }
+        }
+    }
 }
 
 module.exports = new WenJianMoKuai();
