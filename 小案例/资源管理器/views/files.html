@@ -190,31 +190,31 @@
             //去掉第一层路径，加上download路径path)
             let tmp_path = getJieQuUrlPath(value.url_path)
             if (value.isDirectory) {
-                dirhtml = dirhtml + `<div class="col-md-2" style="height: 160px">
-                                    <img src="../public/img/wenjianjia.png" alt="">
+                dirhtml = dirhtml + `<div class="col-md-2" style="height: 150px">
+                                    <img src="../public/img/wenjianjia.png" alt="" class="img-responsive img-rounded">
                                     <p>${value.file_name}</p>
-                                    <a href="/getjson${tmp_path}" isdir="yes">进入</a>
-                                    <a href="/downloaddir${tmp_path}?download=yes" isdownload="yes" isdir="yes">下载</a></div>`;
+                                    <p><a href="/getjson${tmp_path}" isdir="yes">进入</a>
+                                    <a href="/downloaddir${tmp_path}?download=yes" isdownload="yes" isdir="yes">下载</a><p></div>`;
             } else {
                 //如果是图片显示图片的缩略图
                 let img = /\S*\.(png|jpeg|jpg|bmp)/i;
                 if(value.file_name.match(img)){
                     console.log(value.file_name.match(img))
-                    filehtml = filehtml+ `<div class="col-md-2" style="height: 160px">
+                    filehtml = filehtml+ `<div class="col-md-2" style="height: 150px">
                                     <img data-src="simg${tmp_path}" class="lazyload img-responsive img-rounded">
                                     <p>${value.file_name}</p>
                                     <a href="/downloadfile${tmp_path}" isdir="no">下载</a></div>`;
                 }else{
-                    filehtml = filehtml+ `<div class="col-md-2" style="height: 160px">
-                                    <img src="../public/img/wenjian.png" alt="">
+                    filehtml = filehtml+ `<div class="col-md-2" style="height: 150px">
+                                    <img src="../public/img/wenjian.png" alt="" class="img-responsive img-rounded">
                                     <p>${value.file_name}</p>
                                     <a href="/downloadfile${tmp_path}" isdir="no">下载</a></div>`;
                 }
             }
-            $('#filearea').html(dirhtml+filehtml);
-            //懒加载
-            $("#filearea img.lazyload").lazyload();
         });
+        $('#filearea').html(dirhtml+filehtml);
+        //懒加载
+        $("#filearea img.lazyload").lazyload();
     }
 
     // 请求服务器获取文件夹内文件列表并显示
