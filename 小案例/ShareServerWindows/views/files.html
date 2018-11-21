@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../public/bootstrap.css">
+    <script src="../public/jquery-3.3.1.js"></script>
+    <!--懒加载-->
+    <script src="../public/lazyload.js"></script>
+    <!--上传插件-->
+    <script src="../public/jqueryfileupload/vendor/jquery.ui.widget.js"></script>
+    <script src="../public/jqueryfileupload/jquery.iframe-transport.js"></script>
+    <script src="../public/jqueryfileupload/jquery.fileupload.js"></script>
+    <style type="text/css">
+        #dropZone {
+            border: 3px dashed #0088cc;
+            padding: 50px;
+            width: 500px;
+            margin-top: 20px;
+            background-color: #e0f2f1;
+        }
+
+        /*#files {*/
+        /*border: 10px dotted #0088cc;*/
+        /*padding: 20px;*/
+        /*width: 200px;*/
+        /*!*display: none;*!*/
+        /*!*background-color: #f9a825;*!*/
+        /*}*/
+
+        #error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="col-md-12 container-fluid">
+    <!--目录列表-->
+    <div class="col-md-12">
+        <ol id="ol" class="breadcrumb" style="font-size: 20px;">
+            <!--<li><a href="#">Home</a></li>-->
+            <!--<li><a href="#">Library</a></li>-->
+            <!--<li class="active">Data</li>-->
+        </ol>
+    </div>
+    <!--文件列表-->
+    <div class="col-md-7" id="filearea">
+        <table class="table table-hover" id="table">
+            <thead>
+            <tr>
+                <td class="col-md-2" id="file_name">文件名</td>
+                <td class="col-md-2" id="mtime">上次修改时间</td>
+                <td class="col-md-1" id="size">大小</td>
+                <td class="col-md-1">打开</td>
+                <td class="col-md-1">下载</td>
+            </tr>
+            </thead>
+            <tbody id="tbody">
+
+            </tbody>
+        </table>
+    </div>
+    <!--上传-->
+    <div class="col-md-5">
+        <button id="zhedie" class="btn btn-info">折叠</button>
+        <button id="tubiao" class="btn btn-info">图标显示</button>
+        <button id="liebiao" class="btn btn-info">列表显示</button>
+        <div id="dropZone">
+            <h1>Drag & Drop Files...</h1>
+            <input type="file" id="fileupload" name="attachments[]" multiple>
+        </div>
+        <h1 id="error"></h1><br><br>
+        <h1 id="progress"></h1><br><br>
+        <!--<div id="files"></div>-->
+    </div>
+    <!--<div>-->
+    <!--<form action="/upload" method=post enctype="multipart/form-data" accept-charset="utf-8">-->
+    <!--<input type="file" id="data" name="data" />-->
+    <!--<input type="submit" value="上传" id="sub"/>-->
+    <!--</form>-->
+    <!--</div>-->
+    <div class="col-md-12" id="img">
+
+    </div>
+</div>
+
+<script>
+    /**
+     * root_name 根目录名称
+     * ajax_result 每次获取的结果存入ajax_result    排序用
+     * temp_url 每次访问的地址存入temp_url     muLuChuLi用
+     * list_url 存放目录列表 muLuChuLi用
+     * list_length 目录列表长度
+     * fileareahtml 文件显示区域内html
+     * show_style   0 列表显示  1 图标显示
+     */
+    var root_name = "Server";
+    var root_url = "/getjson";
+    var ajax_result = null;
+    var temp_url = null;
+    var list_url = [];
+    var list_length = 0;
+    var fileareahtml = $("#filearea").html();
+    var show_style = 0;
+
+    // 目录列表处理并显示
+    function muLuChuLi(url) {
+        if (url === root_url) {
+            list_url = [];
+            temp_url = {url: url, parent_url: 0};
+            list_url.push(temp_url);
+        } else {
+            // 如果当前列表存在要访问的url则切割；如果不存在则添加新的url
+            let flag_muLuChuLi = false;
+            $.each(list_url, function (index, item) {
+                console.log('item.url:', item.url);
+                console.log('url_path:', url);
+                console.log('item.url === url:', item.url === url, 'index:', index);
+                if (item.url === url) {
+                    list_length = index;
+                    flag_muLuChuLi = true;
+                    return false;
+                }
+            });
+            if (flag_muLuChuLi) {
+                list_url = list_url.slice(0, list_length + 1);
+                temp_url = {url: list_url[list_length].url, parent_url: list_url[list_length].parent_url};
+            } else {
+                temp_url = {url: url, parent_url: temp_url.url};
+                list_url.push(temp_url);
+            }
+        }
+        console.log('list_url:', list_url);
+        console.log('temp_url:', temp_url);
+        $('#ol').empty();
+        $.each(list_url, function (index, item) {
+            let temp = item.url.split('/');
+            temp = temp[temp.length - 1];
+            if (index === 0) {
+                $('#ol').append(`<li><a href="${item.url}" isdir=yes>${root_name}</a></li>`)
+            } else {
+                $('#ol').append(`<li><a href="${item.url}" isdir=yes>${temp}</a></li>`)
+            }
+        });
+    }
+
+    // 根据获取到的文件列表处理并显示  result为ajax返回结果（json对象）
+    function wenJianChuLi(result) {
+        $("#filearea").html(fileareahtml);
+        $('#tbody').empty();
+        $.each(result, function (index, value) {
+            //去掉第一层路径，加上download路径
+            let tmp_path = getJieQuUrlPath(value.url_path);
+            trhtml = `<tr><td>${value.file_name}</td>`;
+            if (value.isDirectory) {
+                trhtml = trhtml + `<td>${value.mtime}</td><td>${value.size}</td>
+                                   <td><a href="/getjson${tmp_path}" isdir="yes">进入</a></td>
+                                   <td><a href="/downloaddir${tmp_path}?download=yes" isdownload="yes" isdir="yes">下载</a></td></tr>`;
+            } else {
+                trhtml = trhtml + `<td>${value.mtime}</td><td>${value.size}</td>
+                                    <td></td><td><a href="/downloadfile${tmp_path}" isdir="no">下载</a></td></tr>`;
+            }
+            $('#tbody').append(trhtml);
+        });
+
+        // $('#img').empty();
+        // $.each(result, function (index, value) {
+        //     let img = /\S*\.(png|jpeg|jpg|bmp)/i;
+        //     let imghtml = ""
+        //     if(value.file_name.match(img)){
+        //         //去掉第一层路径，加上img路径
+        //         let tmp_path = getJieQuUrlPath(value.url_path)
+        //         imghtml = `<img data-src="simg${tmp_path}" class="col-md-2 lazyload img-responsive img-rounded">`
+        //         if( ( (index+1) %6 ) === 0){
+        //             imghtml = imghtml + `<div class="row"></div><br/><div class="row"></div>`
+        //         }
+        //     }
+        //     $('#img').append(imghtml);
+        // });
+        // //懒加载
+        // $("#img img.lazyload").lazyload();
+    }
+
+    //图标方式显示
+    function tuBiaoXianShi(result) {
+        $('#filearea').empty();
+        let dirhtml = "";
+        let filehtml = "";
+        $.each(result, function (index, value) {
+            //去掉第一层路径，加上download路径path)
+            let tmp_path = getJieQuUrlPath(value.url_path);
+            if (value.isDirectory) {
+                dirhtml = dirhtml + `<div class="col-md-2" style="height: 150px">
+                                    <img src="../public/img/wenjianjia.png" alt="" class="img-responsive img-rounded">
+                                    <p>${value.file_name}</p>
+                                    <p><a href="/getjson${tmp_path}" isdir="yes">进入</a>
+                                    <a href="/downloaddir${tmp_path}?download=yes" isdownload="yes" isdir="yes">下载</a><p></div>`;
+            } else {
+                //如果是图片显示图片的缩略图
+                let img = /\S*\.(png|jpeg|jpg|bmp)/i;
+                if (value.file_name.match(img)) {
+                    console.log(value.file_name.match(img));
+                    filehtml = filehtml + `<div class="col-md-2" style="height: 150px">
+                                    <img data-src="simg${tmp_path}" class="lazyload img-responsive img-rounded">
+                                    <p>${value.file_name}</p>
+                                    <a href="/downloadfile${tmp_path}" isdir="no">下载</a></div>`;
+                } else {
+                    filehtml = filehtml + `<div class="col-md-2" style="height: 150px">
+                                    <img src="../public/img/wenjian.png" alt="" class="img-responsive img-rounded">
+                                    <p>${value.file_name}</p>
+                                    <a href="/downloadfile${tmp_path}" isdir="no">下载</a></div>`;
+                }
+            }
+        });
+        $('#filearea').html(dirhtml + filehtml);
+        //懒加载
+        $("#filearea img.lazyload").lazyload();
+    }
+
+    // 请求服务器获取文件夹内文件列表并显示
+    function getfilelist(url) {
+        $.ajax({
+            type: "GET",
+            url,
+            dataType: "json",
+            success: function (result) {
+                console.log('ajax----result: ', result);
+                ajax_result = result;
+                muLuChuLi(url);
+                // $("#filearea").html(fileareahtml);
+                // wenJianChuLi(result);
+                if (show_style === 0) {
+                    wenJianChuLi(result);
+                }
+                if (show_style === 1) {
+                    tuBiaoXianShi(result)
+                }
+            }
+        });
+    }
+
+    getfilelist(root_url);
+
+    // 文件夹打开、下载
+    $('#filearea').on('click', 'a', function (e) {
+        // let url_path = $(this).parent().parent().children().first().text();
+        let url_path = $(this).attr("href");
+        if ($(this).attr('isdir') === "yes") {
+            if ($(this).attr('isdownload') === "yes") {
+                //下载行为默认
+            } else {
+                e.preventDefault();
+                getfilelist(url_path);
+            }
+        }
+    });
+
+    // 目录列表点击
+    $('#ol').on('click', 'a', function (e) {
+        e.preventDefault();
+        let url_path = $(this).attr("href");
+        getfilelist(url_path);
+    });
+
+    // flag排序用
+    var flag = true;
+
+    // 按上次修改时间排序
+    $('#mtime').on('click', function () {
+        flag = !flag;
+        if (ajax_result) {
+            if (flag) {
+                var paixu = ajax_result.sort(
+                    function (a, b) {
+                        if (a.mtime < b.mtime) return -1;
+                        if (a.mtime > b.mtime) return 1;
+                        return 0;
+                    }
+                );
+            } else {
+                var paixu = ajax_result.sort(
+                    function (a, b) {
+                        if (b.mtime < a.mtime) return -1;
+                        if (b.mtime > a.mtime) return 1;
+                        return 0;
+                    }
+                );
+            }
+            wenJianChuLi(ajax_result);
+        }
+    });
+
+    // 按文件名排序
+    $('#file_name').on('click', function () {
+        flag = !flag;
+        if (ajax_result) {
+            if (flag) {
+                var paixu = ajax_result.sort(
+                    function (a, b) {
+                        if (a.file_name < b.file_name) return -1;
+                        if (a.file_name > b.file_name) return 1;
+                        return 0;
+                    }
+                );
+            } else {
+                var paixu = ajax_result.sort(
+                    function (a, b) {
+                        if (b.file_name < a.file_name) return -1;
+                        if (b.file_name > a.file_name) return 1;
+                        return 0;
+                    }
+                );
+            }
+            wenJianChuLi(ajax_result);
+        }
+    });
+
+    // 按文件大小排序
+    $('#size').on('click', function () {
+        flag = !flag;
+        if (ajax_result) {
+            if (flag) {
+                var paixu = ajax_result.sort(
+                    function (a, b) {
+                        if (a.size < b.size) return -1;
+                        if (a.size > b.size) return 1;
+                        return 0;
+                    }
+                );
+            } else {
+                var paixu = ajax_result.sort(
+                    function (a, b) {
+                        if (b.size < a.size) return -1;
+                        if (b.size > a.size) return 1;
+                        return 0;
+                    }
+                );
+            }
+            wenJianChuLi(ajax_result);
+        }
+    });
+
+    //jquery file upload 上传
+    var files = $("#files");
+    $("#fileupload").fileupload({
+        url: '/upload',
+        dropZone: '#dropZone',
+        dataType: 'json',
+        autoUpload: false,
+    }).on('fileuploadadd', function (e, data) {
+        //上传自定义对象数据
+        data.formData = temp_url;
+        console.log('temp_url ', temp_url);
+        console.log('name:', data.files[0].name, '     size:', data.files[0].size);
+        data.submit();
+
+    }).on('fileuploaddone', function (e, data) {
+        getfilelist(temp_url.url);
+        var status = data.jqXHR.responseJSON.status;
+        var msg = data.jqXHR.responseJSON.msg;
+
+        /**
+         if (status == 1) {
+            var path = data.jqXHR.responseJSON.path;
+            $("#files").fadeIn().append('<p><img style="width: 100px; height: 100px;" src="' + path + '" /></p>');
+        } else
+         $("#error").html(msg);
+         */
+    }).on('fileuploadprogressall', function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $("#progress").html("Completed: " + progress + "%");
+    });
+
+    //折叠文件列表，文字切换
+    let zhedie_flag = true;
+    $("#zhedie").click('fast', function () {
+        if (zhedie_flag) {
+            $("#zhedie").text("展开");
+        } else {
+            $("#zhedie").text("折叠");
+        }
+        zhedie_flag = !zhedie_flag;
+        $("#filearea").fadeToggle();
+    });
+
+    //列表显示
+    $("#liebiao").click(function () {
+        show_style = 0;
+        wenJianChuLi(ajax_result);
+    });
+
+    //图标显示
+    $("#tubiao").click(function () {
+        show_style = 1;
+        tuBiaoXianShi(ajax_result)
+    });
+
+    //去除第一层路径返回  传入/abc/efg 返回/efg 找不到返回""
+    function getJieQuUrlPath(url_path) {
+        let tmp_path = url_path.replace('/', '-');
+        let index = tmp_path.indexOf('/');
+        if (index === -1) {
+            return ""
+        } else {
+            return tmp_path.substring(index)
+        }
+    }
+</script>
+</body>
+</html>
