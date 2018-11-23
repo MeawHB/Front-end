@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../public/axios.min.js"></script>
+    <script src="../public/vue.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <table>
+        <thead>
+        <tr>
+            <td>部门</td>
+            <td>早</td>
+            <td>价格</td>
+            <td>正</td>
+            <td>价格</td>
+            <td>晚</td>
+            <td>价格</td>
+            <td>合计</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="i in info">
+            <td>{{ i.bumencaiwu }}</td>
+            <td>{{ i.zao }}</td>
+            <td>{{ i.jiagezao }}</td>
+            <td>{{ i.zheng }}</td>
+            <td>{{ i.jiagezheng }}</td>
+            <td>{{ i.ye }}</td>
+            <td>{{ i.jiageye }}</td>
+            <td>{{ i.heji }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                info: null
+            }
+        },
+        mounted() {
+            axios
+                .get('/canfeibumen')
+                .then(response => (this.info = response.data.recordsets[0]))
+        }
+    })
+</script>
+</body>
+</html>
