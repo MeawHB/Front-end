@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>小球移动</title>
+    <style>
+        #box {
+            height: 600px;
+            width: 800px;
+            background: #F1F1F1;
+            position: absolute;
+        }
+
+        #ball {
+            height: 100px;
+            width: 100px;
+            background: #2979FF;
+            border-radius: 50px;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<div id="box">
+    <div id="ball"></div>
+</div>
+
+<script>
+    var ball = document.getElementById("ball");
+    var box = document.getElementById("box");
+    document.addEventListener('keydown', function (event) {
+        if (event.code === 'ArrowUp' && ball.offsetTop > 0) {
+            ball.style.top = ball.offsetTop - 5 + 'px'
+        }
+        if (event.code === 'ArrowDown' && ball.offsetTop < box.clientHeight - ball.offsetHeight) {
+            ball.style.top = ball.offsetTop + 5 + 'px';
+        }
+        if (event.code === 'ArrowLeft' && ball.offsetLeft > 0) {
+            ball.style.left = ball.offsetLeft - 5 + 'px'
+        }
+        if (event.code === 'ArrowRight' && ball.offsetLeft < box.clientWidth - ball.offsetWidth) {
+            ball.style.left = ball.offsetLeft + 5 + 'px'
+        }
+        console.log(event.code, event.keyCode);
+        console.log("坐标：", ball.offsetLeft, ball.offsetTop)
+    })
+
+
+</script>
+</body>
+</html>
