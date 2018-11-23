@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <p v-cloak>{{ msg }}</p>
+    <p v-text="text"></p>
+    <div v-html="html"></div>
+</div>
+<script src="./public/vue.min.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            msg: 'v-cloak属性设置后,浏览器页面不会出现{{ msg }}闪烁的问题',
+            text: 'v-text在标签内显示文本',
+            html: '<h1>v-html在标签内插入html</h1>'
+        }
+    })
+</script>
+</body>
+</html>
