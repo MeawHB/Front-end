@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        .inner {
+            height: 100px;
+            background-color: #f0ad4e;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="inner" @click="divclick">
+        <button @click.stop="buttonclick">click.stop</button>
+        <button @click="buttonclick">click</button>
+        <br>
+        <a href="http://baidu.com" @click="aclick">click a标签会跳转</a>
+        <a href="http://baidu.com" @click.prevent="aclick">click.prevent阻止a标签默认跳转行为</a>
+    </div>
+    <p v-html="phtml"></p>
+
+</div>
+<script src="./public/vue.min.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            phtml: '@click.stop只有button点击事件被触发' + '<br>'
+        },
+        methods: {
+            divclick() {
+                this.phtml = this.phtml + 'div被点击了' + '<br>'
+            },
+            buttonclick() {
+                this.phtml = this.phtml + 'button被点击了' + '<br>'
+            },
+            aclick() {
+                this.phtml = this.phtml + 'a标签被点击了' + '<br>'
+            }
+        }
+
+    })
+</script>
+</body>
+</html>
