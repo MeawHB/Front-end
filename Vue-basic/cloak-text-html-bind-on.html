@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <p v-cloak>{{ cloak }}</p>
+    <p v-text="text"></p>
+    <div v-html="html"></div>
+    <p v-bind:title="bind1+bind2">v-bind用于绑定属性</p>
+    <p :title="bind1+bind2">:是简写方式</p>
+    <p v-on:click="fun">v-click</p>
+</div>
+<script src="./public/vue.min.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            cloak: 'v-cloak属性设置后,浏览器页面不会出现{{ cloak }}闪烁的问题',
+            text: 'v-text在标签内显示文本',
+            html: '<h1>v-html在标签内插入html</h1>',
+            bind1: 'v-bind用于',
+            bind2: '绑定属性,bind1+bind2'
+        },
+        methods: {
+            fun: function () {
+                //这个html是指data里面的html
+                this.html = "这是v-click点击事件"
+            }
+        }
+
+    })
+</script>
+</body>
+</html>
