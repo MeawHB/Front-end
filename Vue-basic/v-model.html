@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <input type="text" v-model="model" style="width:100%;">
+    <p v-text="model"></p>
+</div>
+<script src="./public/vue.min.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            model: 'v-model双向数据绑定,只能用在表单元素',
+        },
+        methods: {}
+
+    })
+</script>
+</body>
+</html>

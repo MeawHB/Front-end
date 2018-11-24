@@ -14,11 +14,20 @@
 <body>
 <div id="app">
     <div class="inner" @click="divclick">
-        <button @click.stop="buttonclick">click.stop</button>
-        <button @click="buttonclick">click</button>
+        <button @click="buttonclick">先button后div</button>
+        <button @click.stop="buttonclick">stop阻止冒泡</button>
         <br>
         <a href="http://baidu.com" @click="aclick">click a标签会跳转</a>
-        <a href="http://baidu.com" @click.prevent="aclick">click.prevent阻止a标签默认跳转行为</a>
+        <a href="http://baidu.com" @click.prevent.stop="aclick">prevent.stop阻止默认行为阻止冒泡</a>
+    </div>
+    <br>
+    <div class="inner" @click.capture="divclick">
+        <button @click="buttonclick">capture 先div后button</button>
+    </div>
+    <br>
+    <div class="inner" @click.self="divclick">
+        <button @click="buttonclick">self 只有点击div自己才会出发div事件,但不会阻止冒泡到其他标签</button>
+        <button @click.once="buttonclick">once只触发一次</button>
     </div>
     <p v-html="phtml"></p>
 
