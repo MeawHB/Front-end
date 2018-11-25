@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <input type="button" value="toggle" @click="toggle">
+    <p v-if="flag">v-if 删除创建元素</p>
+    <p v-show="flag">v-show 隐藏显示元素</p>
+</div>
+<script src="./public/vue.min.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            flag: true,
+        },
+        methods: {
+            toggle() {
+                this.flag = !this.flag
+            }
+        }
+
+    })
+</script>
+</body>
+</html>

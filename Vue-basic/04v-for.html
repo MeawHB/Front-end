@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<div id="app">
+    <p v-for="(item,index) in list">索引：{{index}} ---- 值：{{item}}</p>
+    <p v-for="(value,key,index) in obj">{{key}}: {{value}}---索引：{{index}}</p>
+    <p v-for="count in 10">{{count}}</p>
+</div>
+<script src="./public/vue.min.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [10, 20, 30, 4, 5, 6],
+            obj: {
+                id: 1,
+                name: "张三",
+                age: 222
+            }
+        },
+        methods: {}
+
+    })
+</script>
+</body>
+</html>
