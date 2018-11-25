@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="./bootstrap.css">
+    <link rel="stylesheet" href="../public/bootstrap.css">
 </head>
 <body>
 <div id="app">
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <h3 class="panel-title">添加品牌</h3>
+            <h3 class="panel-title" v-color="'pink'">添加品牌</h3>
         </div>
         <!--.form-inline 类可使其内容左对齐并且表现为 inline-block 级别的控件-->
         <div class="panel-body form-inline">
@@ -17,11 +17,11 @@
                 <input type="text" class="form-control" v-model="id">
             </label>
             <label>name：
-                <input type="text" class="form-control" v-model="name">
+                <input type="text" class="form-control" v-model="name" @keyup.enter="add">
             </label>
             <input type="button" class="btn btn-primary" value="添加" @click="add">
             <label>关键字：
-                <input type="text" class="form-control" v-model="keywords">
+                <input type="text" class="form-control" v-model="keywords" v-focus>
             </label>
         </div>
     </div>
@@ -58,6 +58,13 @@
         let m = (dt.getMonth() + 1).toString().padStart(2, '0');
         let d = dt.getDate().toString().padStart(2, '0');
         return `${y}-${m}-${d}`;
+    });
+    //全局自定义指令  调用时用v-focus
+    Vue.directive('focus', {
+        //JS相关操作
+        inserted: function (el) {
+            el.focus();
+        }
     });
 
     var vm = new Vue({
@@ -116,7 +123,7 @@
         //私有过滤器
         filters: {
             // item.ctime | dateFormat('L')
-            // 第一个参数datetr为过滤前前面的item.ctime,第二个残害苏pattern为传入的'L'
+            // 第一个参数datetr为过滤前前面的item.ctime,第二个参数pattern为传入的'L'
             dateFormat: function (dateStr, pattern) {
                 let dt = new Date(dateStr);
                 let y = dt.getFullYear();
@@ -129,6 +136,14 @@
                     return `${y}-${m}-${d}`;
                 } else {
                     return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+                }
+            }
+        },
+        directives: {
+            color: {
+                // bind 一般操作样式
+                bind: function (el, binding) {
+                    el.style.color = binding.value
                 }
             }
         }
