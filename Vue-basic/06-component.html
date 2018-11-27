@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .mytrans-enter, .mytrans-leave-to {
+            opacity: 0;
+            transform: translateX(300px);
+        }
+
+        .mytrans-enter-active, .mytrans-leave-active {
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <my-com1></my-com1>
+    <mycom2></mycom2>
+    <mycom3></mycom3>
+    <mycom4></mycom4>
+    <mycom5></mycom5>
+    <hr>
+    <h3>组件切换</h3>
+    <a href="" @click.prevent="comName='my-com1'">my-com1</a>
+    <a href="" @click.prevent="comName='mycom2'">mycom2</a>
+    <a href="" @click.prevent="comName='mycom3'">mycom3</a>
+    <a href="" @click.prevent="comName='mycom4'">mycom4</a>
+    <a href="" @click.prevent="comName='mycom5'">mycom5</a>
+    <transition name="mytrans" mode="out-in">
+        <!--占位符-->
+        <component :is="comName"></component>
+    </transition>
+</div>
+
+<template id="tmp1">
+    <h3>这是mycom4创建的组件</h3>
+</template>
+
+<template id="tmp2">
+    <h3>这是mycom5创建的组件 {{ msg }}</h3>
+</template>
+
+
+<script src="./public/vue.js"></script>
+<script>
+    //第1种方式
+    var com1 = Vue.extend({
+        template: '<h3>这是myCom1创建的组件</h3>'
+    });
+    //            组件名称 模板对象   名称myCom1需要改成my-com1
+    Vue.component('myCom1', com1);
+
+    //第2种方式
+    Vue.component('mycom2', Vue.extend({
+        template: '<h3>这是mycom2创建的组件</h3>'
+    }));
+
+    //第3种方式
+    Vue.component('mycom3', {
+        template: '<h3>这是mycom3创建的组件</h3>'
+    });
+
+    //第4种方式
+    Vue.component('mycom4', {
+        template: '#tmp1'
+    });
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            comName: 'mycom5'
+        },
+        methods: {},
+        //私有组件
+        components: {
+            mycom5: {
+                template: '#tmp2',
+                data: function () {
+                    return {
+                        msg: '这是组件中的data中的数据'
+                    }
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
