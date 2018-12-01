@@ -20,7 +20,7 @@
     <mycom2></mycom2>
     <mycom3></mycom3>
     <mycom4></mycom4>
-    <mycom5 v-bind:parentmsg="vmmsg"></mycom5>
+    <mycom5 v-bind:parentmsg="vmmsg" @func="vmshow"></mycom5>
     <mycom6></mycom6>
     <hr>
     <h3>组件切换</h3>
@@ -28,7 +28,6 @@
     <a href="" @click.prevent="comName='mycom2'">mycom2</a>
     <a href="" @click.prevent="comName='mycom3'">mycom3</a>
     <a href="" @click.prevent="comName='mycom4'">mycom4</a>
-    <a href="" @click.prevent="comName='mycom5'">mycom5</a>
     <a href="" @click.prevent="comName='mycom6'">mycom6</a>
     <transition name="mytrans" mode="out-in">
         <!--占位符-->
@@ -72,19 +71,32 @@
     var vm = new Vue({
         el: '#app',
         data: {
-            comName: 'mycom5',
-            vmmsg: 'vm中data的vmMsg'
+            comName: 'mycom2',
+            vmmsg: 'vm中data的vmMsg',
+            count: 1
         },
-        methods: {},
+        methods: {
+            vmshow(data1, data2) {
+                this.vmmsg = '这是vmshow方法---' + 'mycom5的count1 count2:' + data1 + ' ' + data2
+            }
+        },
         //私有组件
         components: {
             mycom6,
             mycom5: {
-                template: '<h3>这是mycom5创建的组件 {{ msg }} ---  {{ parentmsg }}</h3>',
+                template: `<div><h3>这是mycom5创建的组件 {{ msg }} ---  {{ parentmsg }}</h3>
+                            <button @click="mycom5show">func</button></div>`,
                 props: ['parentmsg'],
                 data: function () {
                     return {
-                        msg: '这是组件中的data中的数据'
+                        msg: '这是组件中的data中的数据',
+                        count: 1,
+                        count2: 100
+                    }
+                },
+                methods: {
+                    mycom5show() {
+                        this.$emit('func', this.count++, this.count2++)
                     }
                 }
             }
