@@ -20,7 +20,7 @@
     <mycom2></mycom2>
     <mycom3></mycom3>
     <mycom4></mycom4>
-    <mycom5 v-bind:parentmsg="vmmsg" @func="vmshow"></mycom5>
+    <mycom5 v-bind:parentmsg="vmmsg" @func="vmshow" ref="mycom5"></mycom5>
     <mycom6></mycom6>
     <hr>
     <h3>组件切换</h3>
@@ -77,7 +77,8 @@
         },
         methods: {
             vmshow(data1, data2) {
-                this.vmmsg = '这是vmshow方法---' + 'mycom5的count1 count2:' + data1 + ' ' + data2
+                this.vmmsg = '这是vmshow方法---' + 'mycom5的count1 count2:' + data1 + ' ' + data2 +
+                    '  这是mycom5的count3：' + this.$refs.mycom5.count3
             }
         },
         //私有组件
@@ -91,7 +92,8 @@
                     return {
                         msg: '这是组件中的data中的数据',
                         count: 1,
-                        count2: 100
+                        count2: 100,
+                        count3: 1111
                     }
                 },
                 methods: {
