@@ -5,9 +5,9 @@ var http = require('http');
 var async = require("./js/async");
 
 let top_url = 'http://www.kanmanhua.me';
-let tar_rul = 'http://www.kanmanhua.me/manhua-65820/';
+let tar_rul = 'http://www.kanmanhua.me/manhua-66908';
 //并发数
-const DNumber = 20;
+const DNumber = 50;
 
 //下载html
 function loadPage(url) {
