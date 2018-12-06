@@ -142,7 +142,6 @@ function getFileNumber(path) {
             }
         })
     }
-
     getNumber(path);
     return file_number
 }
@@ -176,31 +175,58 @@ async function getComicInfo() {
     return comic_obj
 }
 
-async function start() {
-    let comic_obj = await getComicInfo();
-    let comic_name = comic_obj.name;
-    let comic_arr = comic_obj.arr;
 
-    //并发获取图片链接
-    let arrs = await async.mapLimit(comic_arr, ANumber, async function (item) {
-        let num_arr = [];
-        let tmphtml = await loadPage(item.url);
-        let $ = cheerio.load(tmphtml);
-        let num_html = $('.pagination a');
+//获取图片页面链接
+async function getImgPageLink(item) {
+    let num_arr = [];
+    let tmphtml = await loadPage(item.url);
+    let $ = cheerio.load(tmphtml);
+    let num_html = $('.pagination a');
 
-        //去除头尾上一页下一页
-        num_html.splice(0, 1);
-        num_html.splice(num_html.length - 1, 1);
+    //去除头尾上一页下一页
+    num_html.splice(0, 1);
+    num_html.splice(num_html.length - 1, 1);
 
-        num_html.each(function (index, element) {
-            let num = index;
-            let num_url = top_url + element.attribs.href;
-            let obj = {name: num + 1, url: num_url, filepath: item.filepath + path.sep + item.name, isdownload: false};
-            num_arr.push(obj)
-        });
-        return num_arr
+    num_html.each(function (index, element) {
+        let num = index;
+        let num_url = top_url + element.attribs.href;
+        let obj = {name: num + 1, url: num_url, filepath: item.filepath + path.sep + item.name, isdownload: false};
+        num_arr.push(obj)
     });
+    return num_arr
+    //  num_arr
+    // { name: 0,
+    //   url: 'http://www.kanmanhua.me/manhua-65820/91856_1.html',
+    //   filepath: '天鹅绒之吻目录\\第32话：希望' }
+}
 
+//获取图片
+async function getImg(item) {
+    const res = await loadPage(item.url);
+    let $ = cheerio.load(res);
+    let img_url = $('.img-responsive').eq(1)[0].attribs['data-original'];
+    let obj = {name: item.name, url: img_url, filepath: item.filepath};
+    let i = obj.url.lastIndexOf('.');
+    let subfix = obj.url.substring(i);
+    if (mkdirsSync(obj.filepath)) {
+        let tmp_img = await loadImg2(obj.url);
+        console.log(obj.filepath + path.sep + obj.name + subfix);
+        fs.writeFileSync(obj.filepath + path.sep + obj.name + subfix, tmp_img, {encoding: 'binary'});
+        DOWN_NUMBER++;
+        console.log('下载完成：' + DOWN_NUMBER + '/' + FILE_NUMBER + '  ' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%')
+    }
+}
+
+
+async function start() {
+    //获取漫画名称及章节链接
+    let comic_obj = await getComicInfo();
+    //漫画名称
+    let comic_name = comic_obj.name;
+    //章节链接数组
+    let comic_arr = comic_obj.arr;
+    //并发获取图片页面链接
+    let arrs = await async.mapLimit(comic_arr, ANumber, getImgPageLink);
     // 合并上面返回的 多个num_arr数组 的 合并数组arrs
     let num_arr = array_concat(arrs);
     //按照url排序数组
@@ -210,73 +236,26 @@ async function start() {
     //   url: 'http://www.kanmanhua.me/manhua-65820/91856_1.html',
     //   filepath: '天鹅绒之吻目录\\第32话：希望' }
     console.log('获取章节内每页的链接完成');
-
     //待下载文件总数
     FILE_NUMBER = num_arr.length;
+    //创建漫画根目录
+    mkdirsSync(comic_name);
     //待下载漫画目录
-    let current__dir = "./" + comic_name + path.sep;
-
-    let contentObj = [];
-    //测试是否存在,不存在创建新文件
-    if (fs.existsSync('content.json')) {
-        contentObj = JSON.parse(fs.readFileSync('content.json', 'utf-8'));
+    let current_dir = "./" + comic_name + path.sep;
+    //中间超时退出,重新下报错时的那些文件
+    DOWN_NUMBER = getFileNumber(current_dir);
+    if (DOWN_NUMBER - DNumber > 0) {
+        DOWN_NUMBER = DOWN_NUMBER - DNumber
     } else {
-        let emptyarr = [];
-        fs.writeFileSync('content.json', JSON.stringify(emptyarr), (err) => {
-            if (err) throw err;
-        });
+        DOWN_NUMBER = 0
     }
-
-    // 存储下载点
-    let flag = false;
-    for (let i in contentObj) {
-        let item = contentObj[i];
-        if (item.name === comic_name) {
-            flag = true;
-            //可能中间报错导致其他并发失败，重新下载报错前10个
-            if (item.number - DNumber > 0) {
-                contentObj[i].number = item.number - DNumber
-            } else {
-                contentObj[i].number = 0
-            }
-            num_arr.splice(0, contentObj[i].number)
-        }
-    }
-    if (!flag) {
-        contentObj.push({name: comic_name, number: 0})
-    }
-
-    async.mapLimit(num_arr, DNumber, async function (item) {
-        const res = await loadPage(item.url);
-        let $ = cheerio.load(res);
-        let img_url = $('.img-responsive').eq(1)[0].attribs['data-original'];
-        let obj = {name: item.name, url: img_url, filepath: item.filepath};
-        let i = obj.url.lastIndexOf('.');
-        let subfix = obj.url.substring(i);
-        if (mkdirsSync(obj.filepath)) {
-            let tmp_img = await loadImg2(obj.url);
-            console.log(obj.filepath + path.sep + obj.name + subfix);
-            fs.writeFileSync(obj.filepath + path.sep + obj.name + subfix, tmp_img, {encoding: 'binary'});
-
-            for (let i in contentObj) {
-                let item = contentObj[i];
-                if (item.name === comic_name) {
-                    contentObj[i].number = parseInt(contentObj[i].number) + 1;
-                    DOWN_NUMBER = parseInt(contentObj[i].number) + 1
-                }
-            }
-            fs.writeFileSync('content.json', JSON.stringify(contentObj), (err) => {
-                if (err) throw err;
-            });
-
-            console.log('开始下载：' + DOWN_NUMBER + '/' + FILE_NUMBER + '  ' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%')
-        }
-    }, (err, results) => {
-        if (err) throw err;
-        let file_number = getFileNumber(current__dir);
-        console.log(FILE_NUMBER + '个文件下载完成~~~');
-        console.log('文件夹内数量为：' + file_number)
-    })
+    //去除重复文件
+    num_arr.splice(0, DOWN_NUMBER);
+    //下载图片
+    await async.mapLimit(num_arr, DNumber, getImg);
+    console.log('漫画文件数量：' + FILE_NUMBER);
+    console.log('文件夹内数量为：' + getFileNumber(current_dir));
+    console.log('下载完成')
 }
 
 start();
