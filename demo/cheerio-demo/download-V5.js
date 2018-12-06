@@ -7,7 +7,7 @@ var async = require("./js/async");
 let FILE_NUMBER = 0;
 let DOWN_NUMBER = 0;
 let top_url = 'http://www.kanmanhua.me';
-let tar_rul = 'http://www.kanmanhua.me/manhua-66908';
+let tar_rul = 'http://www.kanmanhua.me/manhua-65820/';
 //并发数
 const ANumber = 10;
 const DNumber = 10;
@@ -256,7 +256,7 @@ async function start() {
 
             let fn = readFileNumber("./" + comic_name + "/");
             console.log(FILE_NUMBER + '个文件下载完成~~~');
-            console.log('文件夹内数量为：' + fn)
+            console.log('文件夹内数量为：' + file_number)
         })
     })
 }
