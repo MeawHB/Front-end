@@ -221,14 +221,15 @@ async function start() {
                 for (let i in contentObj) {
                     let item = contentObj[i];
                     if (item.name === comic_name) {
-                        contentObj[i].number = parseInt(contentObj[i].number) + 1
+                        contentObj[i].number = parseInt(contentObj[i].number) + 1;
+                        index = parseInt(contentObj[i].number) + 1
                     }
                 }
                 fs.writeFileSync('content.json', JSON.stringify(contentObj), (err) => {
                     if (err) throw err;
                 });
 
-                console.log('开始下载：' + (index++ / num_arr.length * 100).toFixed(2) + '%')
+                console.log('开始下载：' + (index / num_arr.length * 100).toFixed(2) + '%')
             }
         }, (err, results) => {
             if (err) throw err;
