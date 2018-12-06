@@ -7,7 +7,8 @@ var async = require("./js/async");
 let top_url = 'http://www.kanmanhua.me';
 let tar_rul = 'http://www.kanmanhua.me/manhua-66908';
 //并发数
-const DNumber = 100;
+const ANumber = 10;
+const DNumber = 10;
 const TIMEOUT = 600000;
 
 //下载html
@@ -115,7 +116,7 @@ async function start() {
     //   url: 'http://www.kanmanhua.me/manhua-65820/91856.html',
     //   filepath: '天鹅绒之吻目录' }
 
-    async.mapLimit(comic_arr, DNumber, async function (item) {
+    async.mapLimit(comic_arr, ANumber, async function (item) {
         let num_arr = [];
         let tmphtml = await loadPage(item.url);
         let $ = cheerio.load(tmphtml);
@@ -128,7 +129,7 @@ async function start() {
         num_html.each(function (index, element) {
             let num = index;
             let num_url = top_url + element.attribs.href;
-            let obj = {name: num + 1, url: num_url, filepath: item.filepath + path.sep + item.name};
+            let obj = {name: num + 1, url: num_url, filepath: item.filepath + path.sep + item.name, isdownload: false};
             num_arr.push(obj)
         });
         return num_arr
@@ -141,13 +142,63 @@ async function start() {
         for (let i in arrs) {
             num_arr = num_arr.concat(arrs[i])
         }
-        console.log('获取章节内每页的链接完成');
 
+        // 排序
+        var compare = function (obj1, obj2) {
+            var val1 = obj1.url;
+            var val2 = obj2.url;
+            if (val1 < val2) {
+                return -1;
+            } else if (val1 > val2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        };
+        num_arr.sort(compare);
+        console.log('获取章节内每页的链接完成');
         // console.log(num_arr)
         //  num_arr
         // { name: 0,
         //   url: 'http://www.kanmanhua.me/manhua-65820/91856_1.html',
         //   filepath: '天鹅绒之吻目录\\第32话：希望' }
+
+        // 存储下载点
+        let contentObj = [];
+        contentObj = JSON.parse(fs.readFileSync('content.json', 'utf-8'));
+        let flag = false;
+        for (let i in contentObj) {
+            let item = contentObj[i];
+            if (item.name === comic_name) {
+                flag = true;
+                //可能中间报错导致其他并发失败，重新下载报错前10个
+                if (item.number - DNumber > 0) {
+                    contentObj[i].number = item.number - DNumber
+                } else {
+                    contentObj[i].number = 0
+                }
+                num_arr.splice(0, contentObj[i].number)
+            }
+        }
+        if (!flag) {
+            contentObj.push({name: comic_name, number: 0})
+        }
+
+        // try{
+        //     let fd = fs.openSync('content.json', 'r')
+        //     num_arr = JSON.parse(fs.readFileSync(fd,'utf-8'))
+        // }catch (err) {
+        //     if (err) {
+        //         if (err.code === 'ENOENT') {
+        //             fs.writeFileSync('content.json', JSON.stringify(contentObj), (err) => {
+        //                 if (err) throw err;
+        //                 console.log('content.json创建成功~~');
+        //             });
+        //             return;
+        //         }
+        //         throw err;
+        //     }
+        // }
 
         let index = 0;
         async.mapLimit(num_arr, DNumber, async function (item) {
@@ -160,9 +211,23 @@ async function start() {
             if (mkdirsSync(obj.filepath)) {
                 let tmp_img = await loadImg2(obj.url);
                 console.log(obj.filepath + path.sep + obj.name + subfix);
-                let fsw = fs.createWriteStream(obj.filepath + path.sep + obj.name + subfix);
-                fsw.write(tmp_img, 'binary');
-                fsw.end();
+
+                fs.writeFileSync(obj.filepath + path.sep + obj.name + subfix, tmp_img, {encoding: 'binary'});
+                // fs.writeFileSync
+                // let fsw = fs.createWriteStream(obj.filepath + path.sep + obj.name + subfix);
+                // fsw.write(tmp_img, 'binary');
+                // fsw.end();
+
+                for (let i in contentObj) {
+                    let item = contentObj[i];
+                    if (item.name === comic_name) {
+                        contentObj[i].number = parseInt(contentObj[i].number) + 1
+                    }
+                }
+                fs.writeFileSync('content.json', JSON.stringify(contentObj), (err) => {
+                    if (err) throw err;
+                });
+
                 console.log('开始下载：' + (index++ / num_arr.length * 100).toFixed(2) + '%')
             }
         }, (err, results) => {
