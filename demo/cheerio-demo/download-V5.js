@@ -234,7 +234,7 @@ async function start() {
         }, (err, results) => {
             if (err) throw err;
             // results is now an array of the response bodies
-            console.log('下载完成~~~')
+            console.log(num_arr.length + '个文件下载完成~~~')
         })
     })
 }
