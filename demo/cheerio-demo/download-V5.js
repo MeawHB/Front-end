@@ -4,6 +4,8 @@ const fs = require('fs');
 var http = require('http');
 var async = require("./js/async");
 
+let FILE_NUMBER = 0;
+let DOWN_NUMBER = 0;
 let top_url = 'http://www.kanmanhua.me';
 let tar_rul = 'http://www.kanmanhua.me/manhua-66908';
 //并发数
@@ -142,6 +144,7 @@ async function start() {
         for (let i in arrs) {
             num_arr = num_arr.concat(arrs[i])
         }
+        FILE_NUMBER = num_arr.length;
 
         // 排序
         var compare = function (obj1, obj2) {
@@ -200,7 +203,6 @@ async function start() {
         //     }
         // }
 
-        let index = 0;
         async.mapLimit(num_arr, DNumber, async function (item) {
             const res = await loadPage(item.url);
             let $ = cheerio.load(res);
@@ -222,19 +224,19 @@ async function start() {
                     let item = contentObj[i];
                     if (item.name === comic_name) {
                         contentObj[i].number = parseInt(contentObj[i].number) + 1;
-                        index = parseInt(contentObj[i].number) + 1
+                        DOWN_NUMBER = parseInt(contentObj[i].number) + 1
                     }
                 }
                 fs.writeFileSync('content.json', JSON.stringify(contentObj), (err) => {
                     if (err) throw err;
                 });
 
-                console.log('开始下载：' + (index / num_arr.length * 100).toFixed(2) + '%')
+                console.log('开始下载：' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%')
             }
         }, (err, results) => {
             if (err) throw err;
             // results is now an array of the response bodies
-            console.log(num_arr.length + '个文件下载完成~~~')
+            console.log(FILE_NUMBER + '个文件下载完成~~~')
         })
     })
 }
