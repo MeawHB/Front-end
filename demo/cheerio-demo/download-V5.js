@@ -166,6 +166,25 @@ async function start() {
         //   url: 'http://www.kanmanhua.me/manhua-65820/91856_1.html',
         //   filepath: '天鹅绒之吻目录\\第32话：希望' }
 
+
+        //测试是否存在
+        try {
+            let fd = fs.openSync('content.json', 'r')
+        } catch (err) {
+            if (err) {
+                if (err.code === 'ENOENT') {
+                    let tmparr = [];
+                    fs.writeFileSync('content.json', JSON.stringify(tmparr), (err) => {
+                        if (err) throw err;
+                        console.log('content.json创建成功~~');
+                    });
+                    // return;
+                }
+                // throw err;
+            }
+        }
+
+
         // 存储下载点
         let contentObj = [];
         contentObj = JSON.parse(fs.readFileSync('content.json', 'utf-8'));
@@ -186,22 +205,6 @@ async function start() {
         if (!flag) {
             contentObj.push({name: comic_name, number: 0})
         }
-
-        // try{
-        //     let fd = fs.openSync('content.json', 'r')
-        //     num_arr = JSON.parse(fs.readFileSync(fd,'utf-8'))
-        // }catch (err) {
-        //     if (err) {
-        //         if (err.code === 'ENOENT') {
-        //             fs.writeFileSync('content.json', JSON.stringify(contentObj), (err) => {
-        //                 if (err) throw err;
-        //                 console.log('content.json创建成功~~');
-        //             });
-        //             return;
-        //         }
-        //         throw err;
-        //     }
-        // }
 
         async.mapLimit(num_arr, DNumber, async function (item) {
             const res = await loadPage(item.url);
@@ -231,7 +234,7 @@ async function start() {
                     if (err) throw err;
                 });
 
-                console.log('开始下载：' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%')
+                console.log('开始下载：' + DOWN_NUMBER + '/' + FILE_NUMBER + '  ' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%')
             }
         }, (err, results) => {
             if (err) throw err;
