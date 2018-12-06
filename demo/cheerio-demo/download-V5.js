@@ -7,7 +7,7 @@ var async = require("./js/async");
 let top_url = 'http://www.kanmanhua.me';
 let tar_rul = 'http://www.kanmanhua.me/manhua-66908';
 //并发数
-const DNumber = 100;
+const DNumber = 10;
 const TIMEOUT = 600000;
 
 //下载html
@@ -68,13 +68,14 @@ function loadImg2(url) {
                 html += data
             });
             res.on('end', () => {
-                resolve(html);
+                // resolve(html);
             });
         });
         req.on('error', (e) => {
-            reject(e)
+            loadImg2(url)
         });
         req.end();
+        resolve(html);
     });
     return pm;
 }
