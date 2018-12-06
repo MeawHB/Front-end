@@ -239,7 +239,24 @@ async function start() {
         }, (err, results) => {
             if (err) throw err;
             // results is now an array of the response bodies
-            console.log(FILE_NUMBER + '个文件下载完成~~~')
+
+            let file_number = 0;
+
+            function readFileNumber(path) {
+                var files = fs.readdirSync(path);
+                files.forEach(function (itm, index) {
+                    var stat = fs.statSync(path + itm);
+                    if (stat.isDirectory()) {
+                        readFileNumber(path + itm + "/")
+                    } else {
+                        file_number++
+                    }
+                })
+            }
+
+            let fn = readFileNumber("./" + comic_name + "/");
+            console.log(FILE_NUMBER + '个文件下载完成~~~');
+            console.log('文件夹内数量为：' + fn)
         })
     })
 }

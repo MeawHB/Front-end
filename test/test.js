@@ -1,17 +1,18 @@
 const fs = require('fs');
 
-let arr = [];
-try {
-    let fd = fs.openSync('content.json', 'r')
-} catch (err) {
-    if (err) {
-        if (err.code === 'ENOENT') {
-            fs.writeFileSync('content.json', JSON.stringify(arr), (err) => {
-                if (err) throw err;
-                console.log('content.json创建成功~~');
-            });
+let file_number = 0;
+
+function readFileNumber(path) {
+    var files = fs.readdirSync(path);
+    files.forEach(function (itm, index) {
+        var stat = fs.statSync(path + itm);
+        if (stat.isDirectory()) {
+            readFileNumber(path + itm + "/")
+        } else {
+            file_number++
         }
-        // throw err;
-    }
+    })
 }
 
+readFileNumber("./test/");
+console.log(file_number);
