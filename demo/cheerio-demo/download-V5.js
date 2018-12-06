@@ -59,7 +59,7 @@ function loadImg2(url) {
             hostname: p[1],
             port: 80,
             path: p[2],
-            method: 'GET',
+            method: 'POST',
             timeout: TIMEOUT
         };
         const req = http.request(options, (res) => {
