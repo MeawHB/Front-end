@@ -12,7 +12,7 @@ let DOWN_NUMBER = 0;
 //网站域名
 let top_url = 'http://www.kanmanhua.me';
 //漫画下载链接
-let tar_rul = 'http://www.kanmanhua.me/manhua-65820/';
+let tar_rul = 'http://www.kanmanhua.me/manhua-65536/';
 //获取链接并发数
 const ANumber = 10;
 //下载图片并发数
