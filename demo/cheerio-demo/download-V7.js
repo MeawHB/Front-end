@@ -12,7 +12,7 @@ let DOWN_NUMBER = 0;
 //网站域名
 let top_url = 'http://www.kanmanhua.me';
 //漫画下载链接
-let tar_rul = 'http://www.kanmanhua.me/manhua-65536/';
+let tar_rul = 'http://www.kanmanhua.me/manhua-65820/';
 //获取链接并发数
 const ANumber = 10;
 //下载图片并发数
@@ -185,7 +185,17 @@ async function getComicInfo() {
         let obj = {name: episode_name, url: episode_url, filepath: comic_name};
         comic_arr.push(obj)
     });
-
+    //先排序,否则两次重命名结果会不一样
+    comic_arr = array_sort(comic_arr, 'url');
+    //重复的重命名
+    let tmparr = comic_arr.slice(0);
+    for (let i = 0; i < comic_arr.length; i++) {
+        for (let j = 0; j < tmparr.length; j++) {
+            if (comic_arr[i].name === tmparr[j].name && i !== j) {
+                comic_arr[i].name = comic_arr[i].name + i
+            }
+        }
+    }
     // console.log(comic_arr)
     //  comic_arr 内每一项
     // { name: '第32话：希望',
@@ -195,7 +205,6 @@ async function getComicInfo() {
     console.log('获取漫画名称及章节链接完成');
     return comic_obj
 }
-
 
 //获取图片页面链接
 async function getImgPageLink(item) {
@@ -331,7 +340,6 @@ async function start() {
         }
         console.log('失败：' + fails.length + '个,5秒后重试...........................................');
         await sleep(5);
-        running = false
     }
 
     console.log('漫画文件数量：' + FILE_NUMBER);
