@@ -16,7 +16,7 @@ let tar_rul = 'http://www.kanmanhua.me/manhua-65536/';
 //获取链接并发数
 const ANumber = 10;
 //下载图片并发数
-const DNumber = 10;
+const DNumber = 100;
 //http.request 超时  貌似没用？
 const TIMEOUT = 600000;
 
@@ -132,7 +132,6 @@ function array_sort(arr, field) {
 //统计文件夹内文件数量
 function getFileNumber(path) {
     let file_number = 0;
-
     function getNumber(path) {
         var files = fs.readdirSync(path);
         files.forEach(function (item, index) {
@@ -224,6 +223,14 @@ async function getImgPageLink(item) {
 
 //获取图片
 async function getImg(item) {
+    //检测文件是否存在
+    let filetest = item.filepath + path.sep + item.name + '.jpg';
+    let filetest2 = item.filepath + path.sep + item.name + '.png';
+    let filetest3 = item.filepath + path.sep + item.name + '.gif';
+    if (fs.existsSync(filetest) || fs.existsSync(filetest2) || fs.existsSync(filetest3)) {
+        return null
+    }
+    //下载图片所在网页
     let res = '';
     try {
         res = await loadPage(item.url);
@@ -238,6 +245,7 @@ async function getImg(item) {
         console.log('请求失败:', item.url);
         return item
     }
+    //获取图片链接
     let img_url = {};
     try {
         img_url = $('.img-responsive').eq(1)[0].attribs['data-original'];
@@ -247,6 +255,7 @@ async function getImg(item) {
         return item
         // throw e
     }
+    //下载图片
     let obj = {name: item.name, url: img_url, filepath: item.filepath};
     let i = obj.url.lastIndexOf('.');
     let subfix = obj.url.substring(i);
@@ -264,11 +273,13 @@ async function getImg(item) {
             }
             fs.writeFileSync(filename, tmp_img, {encoding: 'binary'});
             DOWN_NUMBER++;
-            console.log(DOWN_NUMBER + '/' + FILE_NUMBER + '  ' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%'
-                + '  ' + filename)
+            console.log(DOWN_NUMBER + '/' + FILE_NUMBER + '  '
+                + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%'
+                + '  ' + filename);
+            return null
         }
     }
-    return null
+    return item
 }
 
 async function start() {
@@ -309,17 +320,18 @@ async function start() {
     // num_arr.splice(0, DOWN_NUMBER);
     //下载图片
     let fails = num_arr;
-    while (true) {
+    let running = true;
+    while (running) {
         DOWN_NUMBER = getFileNumber(current_dir);
         fails = await async.mapLimit(fails, DNumber, getImg);
-        // console.log(fails);
         fails = filter_array2(fails);
-        // console.log(fails.length)
+        console.log(fails.length);
         if (fails.length === 0) {
-            break
+            running = false
         }
         console.log('失败：' + fails.length + '个,5秒后重试...........................................');
-        await sleep(5)
+        await sleep(5);
+        running = false
     }
 
     console.log('漫画文件数量：' + FILE_NUMBER);
