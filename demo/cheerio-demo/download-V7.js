@@ -53,8 +53,8 @@ function loadImg(url) {
                 resolve(html);
             });
         }).on('error', function (e) {
-            console.log('loagImgErr:', e);
-            reject(error)
+            // console.log('loadImgErr:', e);
+            reject(e)
         });
     });
     return pm;
@@ -149,6 +149,15 @@ function getFileNumber(path) {
     return file_number
 }
 
+//睡眠
+function sleep(t) {
+    return new Promise(_ => setTimeout(_, t * 1000))
+}
+
+//去处数组中的假值
+function filter_array(array) {
+    return array.filter(item => item);
+}
 
 //获取漫画名称及章节链接
 async function getComicInfo() {
@@ -210,16 +219,14 @@ async function getImg(item) {
         res = await loadPage(item.url);
     } catch (e) {
         console.log('loadPageErr:', e);
-        await getImg(item);
-        return
+        return item
     }
     let $ = cheerio.load(res);
 
     //如果是502错误，重新请求
     if ($('title').text() === '502 Bad Gateway') {
-        console.log('请求失败,重新请求', item.url);
-        await getImg(item);
-        return
+        console.log('请求失败:', item.url);
+        return item
     }
     let img_url = {};
     try {
@@ -227,18 +234,29 @@ async function getImg(item) {
     } catch (e) {
         console.log(item.url);
         console.log(res);
-        throw e
+        return item
+        // throw e
     }
     let obj = {name: item.name, url: img_url, filepath: item.filepath};
     let i = obj.url.lastIndexOf('.');
     let subfix = obj.url.substring(i);
     if (mkdirsSync(obj.filepath)) {
-        let tmp_img = await loadImg2(obj.url);
-        console.log(obj.filepath + path.sep + obj.name + subfix);
-        fs.writeFileSync(obj.filepath + path.sep + obj.name + subfix, tmp_img, {encoding: 'binary'});
-        DOWN_NUMBER++;
-        console.log('下载完成：' + DOWN_NUMBER + '/' + FILE_NUMBER + '  ' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%')
+        if (fs.existsSync(obj.filepath + path.sep + obj.name + subfix)) {
+        } else {
+            let tmp_img = '';
+            try {
+                tmp_img = await loadImg(obj.url);
+            } catch (e) {
+                console.log('loadImgErr:', e);
+                return item
+            }
+            console.log(obj.filepath + path.sep + obj.name + subfix);
+            fs.writeFileSync(obj.filepath + path.sep + obj.name + subfix, tmp_img, {encoding: 'binary'});
+            DOWN_NUMBER++;
+            console.log('下载文件：' + DOWN_NUMBER + '/' + FILE_NUMBER + '  ' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%')
+        }
     }
+    return null
 }
 
 async function start() {
@@ -266,48 +284,62 @@ async function start() {
     //待下载漫画目录
     let current_dir = "./" + comic_name + path.sep;
     //中间超时退出,重新下报错时的那些文件
-    DOWN_NUMBER = getFileNumber(current_dir);
+    // DOWN_NUMBER = getFileNumber(current_dir);
     // if (DOWN_NUMBER - DNumber > 0) {
     //     DOWN_NUMBER = DOWN_NUMBER - DNumber
     // } else {
     //     DOWN_NUMBER = 0
     // }
     //去除重复文件
-    num_arr.splice(0, DOWN_NUMBER);
+    // num_arr.splice(0, DOWN_NUMBER);
     //下载图片
-    await async.mapLimit(num_arr, DNumber, getImg);
+    let fails = num_arr;
+    while (true) {
+        DOWN_NUMBER = getFileNumber(current_dir);
+        fails = await async.mapLimit(fails, DNumber, getImg);
+        fails = filter_array(fails);
+        // console.log(fails.length)
+        if (fails.length === 0) {
+            break
+        }
+        console.log('失败：' + fails.length + '个,5秒后重试');
+        await sleep(5)
+    }
 
     console.log('漫画文件数量：' + FILE_NUMBER);
     console.log('文件夹内数量为：' + getFileNumber(current_dir));
     console.log('下载完成')
 }
 
-// start是否运行着
-let running = false;
-let myInterval = setInterval(function () {
-    console.log('程序检查中。。。');
-    if (!running) {
-        running = true;
-        async function func() {
-            try {
-                await start();
-                stopmyInterval()
-            } catch (e) {
-                console.log(e);
-                console.log('出错拉.......10秒后钟重启..............................................');
-                setTimeout(function () {
-                    running = false
-                }, 10000)
-            }
-        }
-        func()
-    }
-}, 3000);
+start();
 
-function stopmyInterval() {
-    console.log('关闭定时器');
-    clearInterval(myInterval);
-}
+
+// // start是否运行着
+// let running = false;
+// let myInterval = setInterval(function () {
+//     console.log('程序检查中。。。');
+//     if (!running) {
+//         running = true;
+//         async function func() {
+//             try {
+//                 await start();
+//                 stopmyInterval()
+//             } catch (e) {
+//                 console.log(e);
+//                 console.log('出错拉.......10秒后钟重启..............................................');
+//                 setTimeout(function () {
+//                     running = false
+//                 }, 10000)
+//             }
+//         }
+//         func()
+//     }
+// }, 3000);
+//
+// function stopmyInterval() {
+//     console.log('关闭定时器');
+//     clearInterval(myInterval);
+// }
 
 // process.on('uncaughtException', function (err) {
 //     console.log('-----------------------------------------------------------------------------------');
