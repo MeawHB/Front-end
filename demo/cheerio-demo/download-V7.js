@@ -302,7 +302,7 @@ async function start() {
         if (fails.length === 0) {
             break
         }
-        console.log('失败：' + fails.length + '个,5秒后重试');
+        console.log('失败：' + fails.length + '个,5秒后重试...........................................');
         await sleep(5)
     }
 
