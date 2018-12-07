@@ -301,6 +301,7 @@ async function start() {
     while (true) {
         DOWN_NUMBER = getFileNumber(current_dir);
         fails = await async.mapLimit(fails, DNumber, getImg);
+        console.log(fails);
         fails = filter_array(fails);
         // console.log(fails.length)
         if (fails.length === 0) {
