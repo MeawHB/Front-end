@@ -12,11 +12,11 @@ let DOWN_NUMBER = 0;
 //网站域名
 let top_url = 'http://www.kanmanhua.me';
 //漫画下载链接
-let tar_rul = 'http://www.kanmanhua.me/manhua-65820/';
+let tar_rul = 'http://www.kanmanhua.me/manhua-65536/';
 //获取链接并发数
 const ANumber = 10;
 //下载图片并发数
-const DNumber = 50;
+const DNumber = 10;
 //http.request 超时  貌似没用？
 const TIMEOUT = 600000;
 
@@ -159,6 +159,13 @@ function filter_array(array) {
     return array.filter(item => item);
 }
 
+//去处数组中的假值
+function filter_array2(array) {
+    return array.filter(item => {
+        return (item !== null)
+    });
+}
+
 //获取漫画名称及章节链接
 async function getComicInfo() {
     let comic_obj = {};
@@ -222,6 +229,7 @@ async function getImg(item) {
         res = await loadPage(item.url);
     } catch (e) {
         console.log('loadPageErr:', e);
+        console.log('PageErr:', item.url);
         return item
     }
     let $ = cheerio.load(res);
@@ -251,6 +259,7 @@ async function getImg(item) {
                 tmp_img = await loadImg(obj.url);
             } catch (e) {
                 console.log('loadImgErr:', e);
+                console.log('ImgErr:', obj.url);
                 return item
             }
             fs.writeFileSync(filename, tmp_img, {encoding: 'binary'});
@@ -274,7 +283,7 @@ async function start() {
     // 合并上面返回的 多个num_arr数组 的 合并数组arrs
     let num_arr = array_concat(arrs);
     //按照url排序数组
-    num_arr = array_sort(num_arr, 'url');
+    // num_arr = array_sort(num_arr, 'url');
     //  num_arr
     // { name: 0,
     //   url: 'http://www.kanmanhua.me/manhua-65820/91856_1.html',
@@ -287,6 +296,8 @@ async function start() {
     mkdirsSync(comic_name);
     //待下载漫画目录
     let current_dir = "./" + comic_name + path.sep;
+    console.log('漫画文件数量：' + FILE_NUMBER);
+    console.log('文件夹内数量为：' + getFileNumber(current_dir));
     //中间超时退出,重新下报错时的那些文件
     // DOWN_NUMBER = getFileNumber(current_dir);
     // if (DOWN_NUMBER - DNumber > 0) {
@@ -301,8 +312,8 @@ async function start() {
     while (true) {
         DOWN_NUMBER = getFileNumber(current_dir);
         fails = await async.mapLimit(fails, DNumber, getImg);
-        console.log(fails);
-        fails = filter_array(fails);
+        // console.log(fails);
+        fails = filter_array2(fails);
         // console.log(fails.length)
         if (fails.length === 0) {
             break
