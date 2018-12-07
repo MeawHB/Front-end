@@ -16,7 +16,7 @@ let tar_rul = 'http://www.kanmanhua.me/manhua-65820/';
 //获取链接并发数
 const ANumber = 10;
 //下载图片并发数
-const DNumber = 500;
+const DNumber = 50;
 //http.request 超时  貌似没用？
 const TIMEOUT = 600000;
 
@@ -225,7 +225,6 @@ async function getImg(item) {
         return item
     }
     let $ = cheerio.load(res);
-
     //如果是502错误，重新请求
     if ($('title').text() === '502 Bad Gateway') {
         console.log('请求失败:', item.url);
@@ -244,7 +243,8 @@ async function getImg(item) {
     let i = obj.url.lastIndexOf('.');
     let subfix = obj.url.substring(i);
     if (mkdirsSync(obj.filepath)) {
-        if (fs.existsSync(obj.filepath + path.sep + obj.name + subfix)) {
+        let filename = obj.filepath + path.sep + obj.name + subfix;
+        if (fs.existsSync(filename)) {
         } else {
             let tmp_img = '';
             try {
@@ -253,10 +253,10 @@ async function getImg(item) {
                 console.log('loadImgErr:', e);
                 return item
             }
-            console.log(obj.filepath + path.sep + obj.name + subfix);
-            fs.writeFileSync(obj.filepath + path.sep + obj.name + subfix, tmp_img, {encoding: 'binary'});
+            fs.writeFileSync(filename, tmp_img, {encoding: 'binary'});
             DOWN_NUMBER++;
-            console.log('下载文件：' + DOWN_NUMBER + '/' + FILE_NUMBER + '  ' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%')
+            console.log(DOWN_NUMBER + '/' + FILE_NUMBER + '  ' + (DOWN_NUMBER / FILE_NUMBER * 100).toFixed(2) + '%'
+                + '  ' + filename)
         }
     }
     return null
@@ -280,6 +280,7 @@ async function start() {
     //   url: 'http://www.kanmanhua.me/manhua-65820/91856_1.html',
     //   filepath: '天鹅绒之吻目录\\第32话：希望' }
     console.log('获取章节内每页的链接完成');
+    console.log('开始下载图片............');
     //待下载文件总数
     FILE_NUMBER = num_arr.length;
     //创建漫画根目录
