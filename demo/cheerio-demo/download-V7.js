@@ -12,7 +12,7 @@ let DOWN_NUMBER = 0;
 //网站域名
 let top_url = 'http://www.kanmanhua.me';
 //漫画下载链接
-let tar_rul = 'http://www.kanmanhua.me/manhua-66908';
+let tar_rul = 'http://www.kanmanhua.me/manhua-65820/';
 //获取链接并发数
 const ANumber = 10;
 //下载图片并发数
@@ -172,11 +172,14 @@ async function getComicInfo() {
     console.log(comic_name);
     let comic_arr = [];
     tmpurls.each(function (index, element) {
-        let episode_name = element.children[0].children[0].data;
+        // let episode_name = element.children[0].children[0].data;  数据太多报错
+        let $ = cheerio.load(element);
+        let episode_name = $('a').text();
         let episode_url = top_url + element.children[0].attribs.href;
         let obj = {name: episode_name, url: episode_url, filepath: comic_name};
         comic_arr.push(obj)
     });
+
     // console.log(comic_arr)
     //  comic_arr 内每一项
     // { name: '第32话：希望',
