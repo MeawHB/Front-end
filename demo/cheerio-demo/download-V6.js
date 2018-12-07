@@ -158,6 +158,7 @@ async function getComicInfo() {
     let comic_name = $('body>div').eq(1).children().eq(0).children().eq(0).children().eq(2).children().eq(0).children().eq(0).text().toString();
     let tmpurls = $('body>div').eq(1).children().eq(0).children().eq(0).children().eq(2).children().eq(1).children().eq(0).children();
     console.log(comic_name);
+    comic_name = comic_name.replace(/[\:\\\/\*\?\"\>\<\|]/g, '');
     let comic_arr = [];
     tmpurls.each(function (index, element) {
         let episode_name = element.children[0].children[0].data;
