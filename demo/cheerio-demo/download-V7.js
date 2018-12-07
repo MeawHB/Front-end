@@ -12,7 +12,7 @@ let DOWN_NUMBER = 0;
 //网站域名
 let top_url = 'http://www.kanmanhua.me';
 //漫画下载链接
-let tar_rul = 'http://www.kanmanhua.me/manhua-65820/';
+let tar_rul = 'http://www.kanmanhua.me/manhua-66908';
 //获取链接并发数
 const ANumber = 10;
 //下载图片并发数
@@ -53,7 +53,8 @@ function loadImg(url) {
                 resolve(html);
             });
         }).on('error', function (e) {
-            reject(e)
+            console.log('loagImgErr:', e);
+            reject(error)
         });
     });
     return pm;
@@ -204,12 +205,28 @@ async function getImgPageLink(item) {
 
 //获取图片
 async function getImg(item) {
-    const res = await loadPage(item.url);
+    let res = '';
+    try {
+        res = await loadPage(item.url);
+    } catch (e) {
+        console.log('loadPageErr:', e);
+        await getImg(item);
+        return
+    }
     let $ = cheerio.load(res);
+
+    //如果是502错误，重新请求
+    if ($('title').text() === '502 Bad Gateway') {
+        console.log('请求失败,重新请求', item.url);
+        await getImg(item);
+        return
+    }
     let img_url = {};
     try {
         img_url = $('.img-responsive').eq(1)[0].attribs['data-original'];
     } catch (e) {
+        console.log(item.url);
+        console.log(res);
         throw e
     }
     let obj = {name: item.name, url: img_url, filepath: item.filepath};
@@ -250,40 +267,45 @@ async function start() {
     let current_dir = "./" + comic_name + path.sep;
     //中间超时退出,重新下报错时的那些文件
     DOWN_NUMBER = getFileNumber(current_dir);
-    if (DOWN_NUMBER - DNumber > 0) {
-        DOWN_NUMBER = DOWN_NUMBER - DNumber
-    } else {
-        DOWN_NUMBER = 0
-    }
+    // if (DOWN_NUMBER - DNumber > 0) {
+    //     DOWN_NUMBER = DOWN_NUMBER - DNumber
+    // } else {
+    //     DOWN_NUMBER = 0
+    // }
     //去除重复文件
     num_arr.splice(0, DOWN_NUMBER);
     //下载图片
     await async.mapLimit(num_arr, DNumber, getImg);
+
     console.log('漫画文件数量：' + FILE_NUMBER);
     console.log('文件夹内数量为：' + getFileNumber(current_dir));
     console.log('下载完成')
 }
 
-start是否运行着;
+// start是否运行着
 let running = false;
 let myInterval = setInterval(function () {
     console.log('程序检查中。。。');
     if (!running) {
         running = true;
-
         async function func() {
-            console.log('start start');
-            await start();
-            console.log('start end');
-            stopmyInterval()
+            try {
+                await start();
+                stopmyInterval()
+            } catch (e) {
+                console.log(e);
+                console.log('出错拉.......10秒后钟重启..............................................');
+                setTimeout(function () {
+                    running = false
+                }, 10000)
+            }
         }
-
         func()
     }
 }, 3000);
 
 function stopmyInterval() {
-    console.log('stopmyInterval');
+    console.log('关闭定时器');
     clearInterval(myInterval);
 }
 
