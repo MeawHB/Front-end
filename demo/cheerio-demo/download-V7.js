@@ -206,7 +206,12 @@ async function getImgPageLink(item) {
 async function getImg(item) {
     const res = await loadPage(item.url);
     let $ = cheerio.load(res);
-    let img_url = $('.img-responsive').eq(1)[0].attribs['data-original'];
+    let img_url = {};
+    try {
+        img_url = $('.img-responsive').eq(1)[0].attribs['data-original'];
+    } catch (e) {
+        throw e
+    }
     let obj = {name: item.name, url: img_url, filepath: item.filepath};
     let i = obj.url.lastIndexOf('.');
     let subfix = obj.url.substring(i);
@@ -259,36 +264,38 @@ async function start() {
     console.log('下载完成')
 }
 
-//start是否运行着
-// let running = false
-// let myInterval = setInterval(function(){
-//     console.log('程序检查中。。。')
-//     if(!running){
-//         running = true
-//         async function func(){
-//             console.log('start start')
-//             await start()
-//             console.log('start end')
-//             stopmyInterval()
-//         }
-//         func()
-//     }
-// }, 3000);
+start是否运行着;
+let running = false;
+let myInterval = setInterval(function () {
+    console.log('程序检查中。。。');
+    if (!running) {
+        running = true;
+
+        async function func() {
+            console.log('start start');
+            await start();
+            console.log('start end');
+            stopmyInterval()
+        }
+
+        func()
+    }
+}, 3000);
+
+function stopmyInterval() {
+    console.log('stopmyInterval');
+    clearInterval(myInterval);
+}
+
+// process.on('uncaughtException', function (err) {
+//     console.log('-----------------------------------------------------------------------------------');
+//     //打印出错误
+//     console.log(err);
+//     //打印出错误的调用栈方便调试
+//     console.log(err.stack);
+//     setTimeout(() => {
+//         start()
+//     }, 5000);
+// });
 //
-// function stopmyInterval() {
-//     console.log('stopmyInterval')
-//     clearInterval(myInterval);
-// }
-
-process.on('uncaughtException', function (err) {
-    console.log('-----------------------------------------------------------------------------------');
-    //打印出错误
-    console.log(err);
-    //打印出错误的调用栈方便调试
-    console.log(err.stack);
-    setTimeout(() => {
-        start()
-    }, 5000);
-});
-
-start();
+// start();

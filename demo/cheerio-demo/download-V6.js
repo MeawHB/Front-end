@@ -162,6 +162,7 @@ async function getComicInfo() {
     let comic_arr = [];
     tmpurls.each(function (index, element) {
         let episode_name = element.children[0].children[0].data;
+        episode_name = episode_name.replace(/[\:\\\/\*\?\"\>\<\|]/g, '');
         let episode_url = top_url + element.children[0].attribs.href;
         let obj = {name: episode_name, url: episode_url, filepath: comic_name};
         comic_arr.push(obj)
