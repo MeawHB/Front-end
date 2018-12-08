@@ -255,14 +255,13 @@ async function getImgPageLink(item) {
 //获取图片
 async function getImg(item) {
     //检测文件是否存在
-
     let filetest = item.filepath + path.sep + item.name + '.jpg';
     let filetest2 = item.filepath + path.sep + item.name + '.png';
     let filetest3 = item.filepath + path.sep + item.name + '.gif';
     if (fs.existsSync(filetest) || fs.existsSync(filetest2) || fs.existsSync(filetest3)) {
         return null
     }
-    console.log(item.filepath);
+    // console.log(item.filepath);
     //下载图片所在网页
     let res = '';
     try {
@@ -333,7 +332,6 @@ async function start() {
     //   url: 'http://www.kanmanhua.me/manhua-65820/91856_1.html',
     //   filepath: '天鹅绒之吻目录\\第32话：希望' }
     console.log('获取章节内每页的链接完成');
-    console.log('开始下载图片............');
     //待下载文件总数
     FILE_NUMBER = num_arr.length;
     //创建漫画根目录
@@ -342,6 +340,7 @@ async function start() {
     let current_dir = "./" + comic_name + path.sep;
     console.log('漫画文件数量：' + FILE_NUMBER);
     console.log('文件夹内数量为：' + getFileNumber(current_dir));
+    console.log('开始下载图片............');
     //中间超时退出,重新下报错时的那些文件
     // DOWN_NUMBER = getFileNumber(current_dir);
     // if (DOWN_NUMBER - DNumber > 0) {
@@ -358,14 +357,14 @@ async function start() {
         DOWN_NUMBER = getFileNumber(current_dir);
         fails = await async.mapLimit(fails, DNumber, getImg);
         fails = filter_array2(fails);
-        console.log(fails.length);
+        // console.log(fails.length);
         if (fails.length === 0) {
             running = false
+        } else {
+            console.log('失败：' + fails.length + '个,5秒后重试...........................................');
+            await sleep(5);
         }
-        console.log('失败：' + fails.length + '个,5秒后重试...........................................');
-        await sleep(5);
     }
-
     console.log('漫画文件数量：' + FILE_NUMBER);
     console.log('文件夹内数量为：' + getFileNumber(current_dir));
     console.log('下载完成')
