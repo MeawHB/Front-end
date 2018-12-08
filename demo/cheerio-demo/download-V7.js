@@ -24,10 +24,12 @@ const TIMEOUT = 600000;
 function loadPage(url) {
     var pm = new Promise(function (resolve, reject) {
         http.get(url, function (res) {
+            res.setEncoding('utf8');
             let html = '';
             res.on('data', function (data) {
-                let buf = Buffer.from(data, 'binary').toString("utf8");
-                html += buf
+                // let buf = Buffer.from(data, 'binary').toString("utf8");
+                // html += buf
+                html += data
             });
             res.on('end', function () {
                 // console.log(html)
@@ -184,20 +186,20 @@ async function getComicInfo() {
     //去除非法字符
     comic_name = comic_name.replace(/[\:\\\/\*\?\"\>\<\|]/g, '');
     let comic_arr = [];
-    let epi_arr = [];
+    // let epi_arr = [];
     tmpurls.each(function (index, element) {
         // let episode_name = element.children[0].children[0].data;  数据太多报错
         let $ = cheerio.load(element);
         let episode_name = $('a').text();
         // let episode_name = element.children[0].attribs.title;
-        epi_arr.push(episode_name);
+        // epi_arr.push(episode_name);
         episode_name = episode_name.replace(/[\:\\\/\*\?\"\>\<\|]/g, '');
         let episode_url = top_url + element.children[0].attribs.href;
         let obj = {name: episode_name, url: episode_url, filepath: comic_name};
         comic_arr.push(obj)
     });
 
-    wr_to_file('epiarr', JSON.stringify(epi_arr));
+    // wr_to_file('epiarr', JSON.stringify(epi_arr));
     //先排序,否则两次重命名结果会不一样
     comic_arr = array_sort(comic_arr, 'url');
     //复制数组
