@@ -1,0 +1,1 @@
+console.log("第542话本��".toString('utf8'));

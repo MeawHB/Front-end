@@ -143,7 +143,6 @@ function getFileNumber(path) {
             }
         })
     }
-
     getNumber(path);
     return file_number
 }
@@ -158,12 +157,18 @@ function filter_array(array) {
     return array.filter(item => item);
 }
 
-//去处数组中的假值
+//去处数组中null值
 function filter_array2(array) {
     return array.filter(item => {
         return (item !== null)
     });
 }
+
+//写入文件
+function wr_to_file(filename, data) {
+    fs.writeFileSync(filename, data, {encoding: 'utf8'});
+}
+
 
 //获取漫画名称及章节链接
 async function getComicInfo() {
@@ -176,26 +181,41 @@ async function getComicInfo() {
     let comic_name = $('body>div').eq(1).children().eq(0).children().eq(0).children().eq(2).children().eq(0).children().eq(0).text().toString();
     let tmpurls = $('body>div').eq(1).children().eq(0).children().eq(0).children().eq(2).children().eq(1).children().eq(0).children();
     console.log(comic_name);
+    //去除非法字符
+    comic_name = comic_name.replace(/[\:\\\/\*\?\"\>\<\|]/g, '');
     let comic_arr = [];
+    let epi_arr = [];
     tmpurls.each(function (index, element) {
         // let episode_name = element.children[0].children[0].data;  数据太多报错
         let $ = cheerio.load(element);
         let episode_name = $('a').text();
+        // let episode_name = element.children[0].attribs.title;
+        epi_arr.push(episode_name);
+        episode_name = episode_name.replace(/[\:\\\/\*\?\"\>\<\|]/g, '');
         let episode_url = top_url + element.children[0].attribs.href;
         let obj = {name: episode_name, url: episode_url, filepath: comic_name};
         comic_arr.push(obj)
     });
+
+    wr_to_file('epiarr', JSON.stringify(epi_arr));
     //先排序,否则两次重命名结果会不一样
     comic_arr = array_sort(comic_arr, 'url');
+    //复制数组
+    let tmparr = JSON.parse(JSON.stringify(comic_arr));
+    // wr_to_file('comic',JSON.stringify(comic_arr))
+    // wr_to_file('tmparr',JSON.stringify(tmparr))
     //重复的重命名
-    let tmparr = comic_arr.slice(0);
-    for (let i = 0; i < comic_arr.length; i++) {
-        for (let j = 0; j < tmparr.length; j++) {
-            if (comic_arr[i].name === tmparr[j].name && i !== j) {
-                comic_arr[i].name = comic_arr[i].name + i
+    for (let j = 0; j < tmparr.length; j++) {
+        for (let i = 0; i < comic_arr.length; i++) {
+            if ((comic_arr[i].name === tmparr[j].name) && (i !== j)) {
+                let tmpstr = comic_arr[i].url;
+                let tmpstr2 = tmpstr.substring(tmpstr.lastIndexOf('/') + 1, tmpstr.lastIndexOf('.'));
+                comic_arr[i].name = comic_arr[i].name + tmpstr2.toString()
             }
         }
     }
+    // wr_to_file('comic2',JSON.stringify(comic_arr))
+    // wr_to_file('tmparr2',JSON.stringify(tmparr))
     // console.log(comic_arr)
     //  comic_arr 内每一项
     // { name: '第32话：希望',
@@ -233,12 +253,14 @@ async function getImgPageLink(item) {
 //获取图片
 async function getImg(item) {
     //检测文件是否存在
+
     let filetest = item.filepath + path.sep + item.name + '.jpg';
     let filetest2 = item.filepath + path.sep + item.name + '.png';
     let filetest3 = item.filepath + path.sep + item.name + '.gif';
     if (fs.existsSync(filetest) || fs.existsSync(filetest2) || fs.existsSync(filetest3)) {
         return null
     }
+    console.log(item.filepath);
     //下载图片所在网页
     let res = '';
     try {
