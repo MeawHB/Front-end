@@ -376,7 +376,7 @@ if (process.argv[2]) {
     tar_url = process.argv[2];
     start();
 } else {
-    console.log('输入格式:  node download-V8.js http://www.kanmanhua.me/manhua-65536/')
+    console.log("输入格式:  node download-V8.js 'http://www.kanmanhua.me/manhua-65536/'")
 }
 
 
