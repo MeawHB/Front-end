@@ -1,0 +1,184 @@
+/*����*/
+.phone {
+    color: red;
+    display: block;
+    margin-left: 4
+}
+
+/*����*/
+.exam {
+    display: block;
+    margin-left: 8px;
+}
+
+/*�ϱ�*/
+.upper {
+    vertical-align: super;
+    font-size: 60%
+}
+
+/*Ӣ������*/
+.f {
+    /*font-family:"Arial Unicode MS";*/
+    color: grey;
+    font-style: italic;
+}
+
+/*��������*/
+.n {
+    /*font-family:"Arial Unicode MS";*/
+    color: grey;
+    display: block;
+    margin-left: 4px;
+    font-size: 90%
+}
+
+/*����*/
+.l {
+    display: block;
+}
+
+/*����*/
+.pos {
+    /*font-family:"Arial Unicode MS";*/
+    display: block;
+    margin-left: 6px;
+    color: red;
+}
+
+/*���Դ���ת��*/
+.trs, .phrs {
+    /*font-family:"Arial Unicode MS";*/
+    margin-top: 6px;
+}
+
+/*����*/
+.phrs {
+    /*font-family:"Arial Unicode MS";*/
+    display: block;
+    margin-left: 6px;
+    font-weight: bold;
+}
+
+.phr {
+    /*font-family:"Courier New";*/
+    color: darkblue;
+    font-weight: bold;
+    font-size: 110%
+}
+
+.des {
+    /*font-family:"Arial Unicode MS";*/
+    display: block;
+    margin-left: 4px;
+    color: black;
+    font-weight: bold;
+    font-size: 65%
+}
+
+.phrs .tr {
+    /*font-family:"Arial Unicode MS";*/
+    display: block;
+    margin-left: 4px;
+    color: black;
+    font-weight: bold;
+    font-size: 65%
+}
+
+/*���룬��*/
+.entryNum {
+    font-weight: bold;
+    color: darkblue;
+    display: inline;
+    /*display:none;*/
+    font-weight: bold;
+    margin-right: 3px
+}
+
+.entryDot {
+    font-weight: bold;
+    color: darkblue;
+    /*display:inline;*/
+    display: none;
+    font-weight: bold;
+    margin-right: 3px
+}
+
+/*
+.tr{
+	display:block;
+}
+*/
+/*ͬ��� ���� �����*/
+.tongyici {
+    /*font-family:"Arial Unicode MS";*/
+    margin-left: 4px;
+    font-weight: bold;
+    display: block;
+}
+
+.fanyici {
+    /*font-family:"Arial Unicode MS";*/
+    margin-left: 4px;
+    font-weight: bold;
+    display: block;
+}
+
+.bianxing {
+    /*font-family:"Arial Unicode MS";*/
+    margin-left: 4px;
+    font-weight: bold;
+    display: block;
+}
+
+.anto {
+    /*font-family:"Arial Unicode MS";*/
+    margin-top: 4px;
+    margin-left: 10px;
+    display: block;
+}
+
+.wf {
+    /*font-family:"Arial Unicode MS";*/
+    margin-top: 4px;
+    margin-left: 10px;
+    display: block;
+}
+
+.syno {
+    /*font-family:"Arial Unicode MS";*/
+    margin-top: 4px;
+    margin-left: 10px;
+    display: block;
+}
+
+.anto .i {
+    /*font-family:"Arial Unicode MS";*/
+    font-style: italic;
+    display: block;
+}
+
+.wf .i {
+    /*font-family:"Arial Unicode MS";*/
+    font-style: italic;
+    display: block;
+}
+
+.syno .i {
+    /*font-family:"Arial Unicode MS";*/
+    font-style: italic;
+    display: block;
+}
+
+/*��������*/
+.ref_title {
+    /*font-family:"Arial Unicode MS";*/
+    margin-right: 4;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.reference {
+    /*font-family:"Arial Unicode MS";*/
+    font-style: italic;
+}
