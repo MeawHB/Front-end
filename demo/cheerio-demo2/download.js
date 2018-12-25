@@ -3,6 +3,32 @@ const config = require('./config.json');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
+
+//下载视频
+
+function loadvideo(url, filename) {
+    var pm = new Promise(function (resolve, reject) {
+        https.get(url, function (res) {
+            res.setEncoding('binary');
+            let length = res.headers['content-length'];
+            let video = '';
+            res.on('data', function (data) {
+                video += data;
+                console.log(filename + (video.length / length * 100).toFixed(2) + '%')
+            });
+            res.on('end', function () {
+                fs.writeFileSync(filename, video, {encoding: 'binary'});
+                console.log(filename + '---下载成功');
+                resolve(filename + '---下载成功');
+            });
+        }).on('error', function (e) {
+            reject(e)
+        });
+    });
+    return pm;
+}
+
 
 //创建文件夹
 function mkdirsSync(dirname) {
@@ -176,8 +202,11 @@ async function download() {
     console.log('获取视频网页地址成功');
 
     //下载
-    for (let i = 2; i < idarr.length; i++) {
-
+    for (let i = 2; i < video_arr.length; i++) {
+        let tmparr = video_arr[i].url.split('/');
+        let filename = tmparr[tmparr.length - 1].replace('html', 'mp4');
+        mkdirsSync(video_arr[i].name);
+        await loadvideo(video_arr[i].url.replace('html', 'mp4'), video_arr[i].name + '/' + filename)
     }
 }
 
