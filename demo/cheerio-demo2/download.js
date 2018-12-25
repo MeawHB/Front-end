@@ -4,18 +4,48 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const readline = require('readline');
+
+//读取命令行
+function read() {
+    return new Promise((resolve, reject) => {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+            prompt: '请选择课程（数字）：'
+        });
+        rl.prompt();
+        let str=''
+        rl.on('line', (line) => {
+            str = line
+            rl.close()
+        }).on('close', () => {
+            resolve(str)
+        });
+    });
+}
+
+
+//单行显示
+function log(str) {
+    //光标上移n1行
+    process.stdout.write('\033[1A');
+    //\r移动到行首  033[K 清楚光标到行尾
+    process.stdout.write('\r\033[K');
+    console.log('\x1B[36m%s\x1B[0m', str);
+}
 
 //下载视频
-
 function loadvideo(url, filename) {
     var pm = new Promise(function (resolve, reject) {
         https.get(url, function (res) {
             res.setEncoding('binary');
             let length = res.headers['content-length'];
             let video = '';
+            console.log('')
             res.on('data', function (data) {
                 video += data;
-                console.log(filename + (video.length / length * 100).toFixed(2) + '%')
+                log(filename +'  '+ (video.length / length * 100).toFixed(2) + '%')
             });
             res.on('end', function () {
                 fs.writeFileSync(filename, video, {encoding: 'binary'});
@@ -110,11 +140,16 @@ async function download() {
             planCourseId: element.attribs.onclick.split('\'')[3]
         })
     });
-    console.log(framearr);
     console.log('获取课表成功。。。');
 
+    //输出数字以及代表的课程名臣
+    for (let i=0; i < framearr.length; i++) {
+        console.log(i,framearr[i].name)
+    }
+    let num = await read()
 
-    let tmpobj = framearr[7];
+    let tmpobj = framearr[num];
+
     let optslearn = {
         url: 'https://wl.scutde.net/edu3/edu3/learning/interactive/main.html?planCourseId=' + tmpobj.planCourseId + '&courseId=' + tmpobj.courseId + '&isNeedReExamination=',
         method: 'GET',
@@ -201,13 +236,26 @@ async function download() {
     console.log(video_arr);
     console.log('获取视频网页地址成功');
 
+    let GREEN = "\033[32m"
+    let END = "\033[0m"
+    console.log();
     //下载
-    for (let i = 2; i < video_arr.length; i++) {
+    for (let i = 0; i < video_arr.length; i++) {
         let tmparr = video_arr[i].url.split('/');
         let filename = tmparr[tmparr.length - 1].replace('html', 'mp4');
+        let filepath = video_arr[i].name + '/' + filename
         mkdirsSync(video_arr[i].name);
-        await loadvideo(video_arr[i].url.replace('html', 'mp4'), video_arr[i].name + '/' + filename)
+        if (fs.existsSync(filepath)) {
+            console.log(filepath+'  已存在')
+            continue
+        }
+        console.log('视频文件总数：',video_arr.length,'  开始下载第： ',GREEN ,i+1, END, '个');
+        let tmpurl = video_arr[i].url.substring(0,video_arr[i].url.length-4) + 'mp4'
+        console.log(tmpurl)
+        await loadvideo(tmpurl, filepath)
     }
+    console.log('下载完成～～～')
+    process.exit(0)
 }
 
 download();
