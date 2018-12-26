@@ -1,9 +1,21 @@
+//request请求网页用的模块
 const request = require('request');
+// config.json存储用户名密码
+// const config = require('./config.json');就相当于
+// config={
+//     name:'aaa',
+//     password:'bbb'
+// }
 const config = require('./config.json');
+//cheerio用法同jquery
 const cheerio = require('cheerio');
+//fs是文件操作用到的模块
 const fs = require('fs');
+//path是路径操作用到的模块
 const path = require('path');
+//https是请求https网页操作用到的模块
 const https = require('https');
+//readline是读取一行的模块，read函数会用到
 const readline = require('readline');
 
 //等待用户输入 参考nodejs文档，稍加修改，resolve就是返回str
@@ -37,11 +49,13 @@ function log(str) {
     process.stdout.write('\033[1A');
     //\r移动到行首  033[K 清楚光标到行尾
     process.stdout.write('\r\033[K');
+    //'\x1B[36m%s\x1B[0m   %s两边的是颜色
     console.log('\x1B[36m%s\x1B[0m', str);
 }
 
 //下载视频
 function loadvideo(url, filename) {
+    //改成promise版本，就能用async了，不然会异步执行
     var pm = new Promise(function (resolve, reject) {
         https.get(url, function (res) {
             res.setEncoding('binary');
@@ -49,15 +63,25 @@ function loadvideo(url, filename) {
             let video = '';
             console.log('');
             res.on('data', function (data) {
+                //一个视频很大，要接收很多次数据，每次都会触发res.on('data',
+                // 把let length = res.headers['content-length']，也就是响应头的长度作为分母
+                // video是收到的数据，作为分子
+                // toFixed(2)是两位小数
+                // filename是传入的文件名
+                // 拼接出要输出的进度条
                 video += data;
+                ///log 参考log函数
                 log(filename + '  ' + (video.length / length * 100).toFixed(2) + '%')
             });
             res.on('end', function () {
+                //数据接收完后会触发 res.on('end',
+                //把前面的video写入文件
                 fs.writeFileSync(filename, video, {encoding: 'binary'});
                 console.log(filename + '---下载成功');
                 resolve(filename + '---下载成功');
             });
         }).on('error', function (e) {
+            //如果出错，返回错误e
             reject(e)
         });
     });
@@ -67,9 +91,11 @@ function loadvideo(url, filename) {
 
 //创建文件夹
 function mkdirsSync(dirname) {
+    //如果文件夹存在，返回
     if (fs.existsSync(dirname)) {
         return true;
     } else {
+        //如果文件夹不存在，递归创建
         if (mkdirsSync(path.dirname(dirname))) {
             fs.mkdirSync(dirname);
             return true;
@@ -219,11 +245,15 @@ async function download() {
             Cookie: reslogin.res.headers['set-cookie']
         }
     };
+    //reslearn 请求点击课程后显示章节的页面返回的对象，reslearn.body是页面内容
     let reslearn = await send(optslearn);
     // console.log(reslearn.body)
-
+    //strlearn 请求点击课程后显示章节的页面
     let strlearn = reslearn.body;
+
     //取var zNodes之后第一对有效的中括号内的内容
+    // 找到var zNodes在上面的字符串中的位置，取得这个变量从[开始，到第一个[对应的结束]里面的内容
+    // start [在数组中的下标  end ]在数组中的下标  left[出现的次数 right]出现的次数
     let start = strlearn.indexOf('var zNodes');
     let end = start;
     let left = 0;
@@ -245,28 +275,39 @@ async function download() {
             break
         }
     }
+    //strlearn.substring(start, end)截取字符串
+    //JSON.parse把字符串转换成对象
     let zhangjie_arr = JSON.parse(strlearn.substring(start, end));
 
+    //zhangjie_arr的结构有很多层，查看每个里面是否有nodes，有的话继续往下找
     let idarr = [];
 
     function foo(arr, filename) {
+        //遍历arr数组，也就是下面传入的zhangjie_arr的结构有很多层
         for (let i = 0; i < arr.length; i++) {
             let tmpname = '';
+            //filename第一次没有目录，传进来是空的'',所以 tmpname = arr[i].name
+            //filename第二次开始，foo(arr[i].nodes, tmpname)，是递归进来的，要拼接路径
+            // 结果类似。。离散数学/第一章/第一节
             if (filename) {
                 tmpname = filename + '/' + arr[i].name
             } else {
                 tmpname = arr[i].name
             }
+            //把修改后的内容存入idarr数组，每个数组元素都是一个对象，对象名name，id是课程id
+            //arr[i].id.substring(0, arr[i].id.indexOf(',') 是截取id里面到后面的，为止的内容，再后面是层次，没用的
             idarr.push({
                 name: tmpname,
                 id: arr[i].id.substring(0, arr[i].id.indexOf(','))
             });
+            //如果存在nodes，递归查找
             if (arr[i].nodes) {
                 foo(arr[i].nodes, tmpname)
             }
         }
     }
 
+    //调用foo
     foo(zhangjie_arr, '');
     console.log(idarr);
     console.log('获取章节成功。。。');
@@ -274,6 +315,7 @@ async function download() {
 
     //获取视频网页
     let video_arr = [];
+    //遍历idarr，用idarr的id拼接下面的地址
     for (let i = 0; i < idarr.length; i++) {
         let optsshipin = {
             url: 'https://wl.scutde.net/edu3/edu3/learning/interactive/materesource/list.html?syllabusId=' + idarr[i].id,
@@ -283,22 +325,28 @@ async function download() {
                 Cookie: reslogin.res.headers['set-cookie']
             }
         };
+        //resshipin 返回上面请求的视频链接的对象 resshipin.body是网页内容
         let resshipin = await send(optsshipin);
+        //let $ = cheerio.load(resshipin.body); 固定写法，这样就能想jquery一样操作 resshipin.body这个网页内容了
         let $ = cheerio.load(resshipin.body);
+        //遍历网页内所哟䣌a标签
         $('a').each(function () {
             let href = $(this).attr('href');
             let href2 = '';
+            //wmv视频直接从onclick里面取
             if ($(this).attr('onclick')) {
                 href2 = $(this).attr('onclick').split('\'')[5];
             }
             if (href2.indexOf("wmv") != -1) {
-                //去掉重复url
+                //去掉重复url flag为标记，默认true表示要存进去
                 let flag = true;
+                //遍历video_arr，如果存在链接了，就把flag设置为false，就不会再存进去了
                 for (let i = 0; i < video_arr.length; i++) {
                     if (video_arr[i].url === href2) {
                         flag = false
                     }
                 }
+                //true存进去，false不存
                 if (flag) {
                     video_arr.push({
                         name: idarr[i].name,
@@ -307,6 +355,7 @@ async function download() {
                     })
                 }
             }
+            //mp4视频 判断 href里面是否有video字符串，有的话，存进去
             if (href.indexOf("video") != -1) {
                 video_arr.push({
                     name: idarr[i].name,
@@ -320,6 +369,7 @@ async function download() {
     console.log(video_arr);
     console.log('获取视频网页地址成功');
 
+    //控制台文件颜色
     let GREEN = "\033[32m";
     let END = "\033[0m";
     console.log();
@@ -329,30 +379,34 @@ async function download() {
         let fileurl = '';
         if (video_arr[i].prefix === 'html') {
             //MP4
-            let tmparr = video_arr[i].url.split('/');
-            let filename = tmparr[tmparr.length - 1].replace('html', 'mp4');
-            filepath = video_arr[i].name + '/' + filename;
-            fileurl = video_arr[i].url.substring(0, video_arr[i].url.length - 4) + 'mp4';
+            let tmparr = video_arr[i].url.split('/'); //用/切分
+            let filename = tmparr[tmparr.length - 1].replace('html', 'mp4'); //把字符串html替换为mp4
+            filepath = video_arr[i].name + '/' + filename; //文件路劲
+            fileurl = video_arr[i].url.substring(0, video_arr[i].url.length - 4) + 'mp4'; //拼接
             console.log(fileurl)
         }
         if (video_arr[i].prefix === 'wmv') {
-            //wmv
-            let tmparr = video_arr[i].url.split('/');
-            let filename = tmparr[tmparr.length - 1];
-            filepath = video_arr[i].name + '/' + filename;
-            fileurl = video_arr[i].url;
+            //处理wmv
+            let tmparr = video_arr[i].url.split('/');   //用/切分
+            let filename = tmparr[tmparr.length - 1];   //最后的文件名
+            filepath = video_arr[i].name + '/' + filename; //文件路劲
+            fileurl = video_arr[i].url;  //视频链接
             console.log(fileurl)
         }
+        //同步创建文件夹
         mkdirsSync(video_arr[i].name);
+        //如果视频已存在，就不重复下载了，continue继续下一个循环
         if (fs.existsSync(filepath)) {
             console.log(filepath + '  已存在');
             continue
         }
         console.log('视频文件总数：', video_arr.length, '  开始下载第： ', GREEN, i + 1, END, '个');
+        //下载，具体看loadvideo函数
         await loadvideo(fileurl, filepath)
     }
     console.log('下载完成～～～');
     process.exit(0)
 }
 
+//下载
 download();
