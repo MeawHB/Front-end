@@ -45,7 +45,7 @@ function loadvideo(url, filename) {
             console.log('');
             res.on('data', function (data) {
                 video += data;
-                log(filename +'  '+ (video.length / length * 100).toFixed(2) + '%')
+                log(filename + '  ' + (video.length / length * 100).toFixed(2) + '%')
             });
             res.on('end', function () {
                 fs.writeFileSync(filename, video, {encoding: 'binary'});
@@ -143,8 +143,8 @@ async function download() {
     console.log('获取课表成功。。。');
 
     //输出数字以及代表的课程名臣
-    for (let i=0; i < framearr.length; i++) {
-        console.log(i,framearr[i].name)
+    for (let i = 0; i < framearr.length; i++) {
+        console.log(i, framearr[i].name)
     }
     let num = await read();
 
@@ -210,6 +210,7 @@ async function download() {
     console.log(idarr);
     console.log('获取章节成功。。。');
 
+
     //获取视频网页
     let video_arr = [];
     for (let i = 0; i < idarr.length; i++) {
@@ -224,11 +225,21 @@ async function download() {
         let resshipin = await send(optsshipin);
         let $ = cheerio.load(resshipin.body);
         $('a').each(function () {
-            var href = $(this).attr('href');
+            let href = $(this).attr('href');
+            let href2 = $(this).attr('onclick').split('\'')[5];
+            console.log(href2);
+            if (href2.indexOf("wmv") != -1) {
+                video_arr.push({
+                    name: idarr[i].name,
+                    url: href2,
+                    prefix: 'wmv'
+                })
+            }
             if (href.indexOf("video") != -1) {
                 video_arr.push({
                     name: idarr[i].name,
-                    url: href
+                    url: href,
+                    prefix: 'html'
                 })
             }
         });
@@ -241,18 +252,31 @@ async function download() {
     console.log();
     //下载
     for (let i = 0; i < video_arr.length; i++) {
-        let tmparr = video_arr[i].url.split('/');
-        let filename = tmparr[tmparr.length - 1].replace('html', 'mp4');
-        let filepath = video_arr[i].name + '/' + filename;
+        let filepath = '';
+        let fileurl = '';
+        if (video_arr[i].prefix === 'html') {
+            //MP4
+            let tmparr = video_arr[i].url.split('/');
+            let filename = tmparr[tmparr.length - 1].replace('html', 'mp4');
+            filepath = video_arr[i].name + '/' + filename;
+            fileurl = video_arr[i].url.substring(0, video_arr[i].url.length - 4) + 'mp4';
+            console.log(fileurl)
+        }
+        if (video_arr[i].prefix === 'wmv') {
+            //MP4
+            let tmparr = video_arr[i].url.split('/');
+            let filename = tmparr[tmparr.length - 1];
+            filepath = video_arr[i].name + '/' + filename;
+            fileurl = video_arr[i].url;
+            console.log(fileurl)
+        }
         mkdirsSync(video_arr[i].name);
         if (fs.existsSync(filepath)) {
             console.log(filepath + '  已存在');
             continue
         }
-        console.log('视频文件总数：',video_arr.length,'  开始下载第： ',GREEN ,i+1, END, '个');
-        let tmpurl = video_arr[i].url.substring(0, video_arr[i].url.length - 4) + 'mp4';
-        console.log(tmpurl);
-        await loadvideo(tmpurl, filepath)
+        console.log('视频文件总数：', video_arr.length, '  开始下载第： ', GREEN, i + 1, END, '个');
+        await loadvideo(fileurl, filepath)
     }
     console.log('下载完成～～～');
     process.exit(0)
