@@ -226,14 +226,25 @@ async function download() {
         let $ = cheerio.load(resshipin.body);
         $('a').each(function () {
             let href = $(this).attr('href');
-            let href2 = $(this).attr('onclick').split('\'')[5];
-            console.log(href2);
+            let href2 = '';
+            if ($(this).attr('onclick')) {
+                href2 = $(this).attr('onclick').split('\'')[5];
+            }
             if (href2.indexOf("wmv") != -1) {
-                video_arr.push({
-                    name: idarr[i].name,
-                    url: href2,
-                    prefix: 'wmv'
-                })
+                //去掉重复url
+                let flag = true;
+                for (let i = 0; i < video_arr.length; i++) {
+                    if (video_arr[i].url === href2) {
+                        flag = false
+                    }
+                }
+                if (flag) {
+                    video_arr.push({
+                        name: idarr[i].name,
+                        url: href2,
+                        prefix: 'wmv'
+                    })
+                }
             }
             if (href.indexOf("video") != -1) {
                 video_arr.push({
@@ -244,6 +255,7 @@ async function download() {
             }
         });
     }
+
     console.log(video_arr);
     console.log('获取视频网页地址成功');
 
@@ -263,7 +275,7 @@ async function download() {
             console.log(fileurl)
         }
         if (video_arr[i].prefix === 'wmv') {
-            //MP4
+            //wmv
             let tmparr = video_arr[i].url.split('/');
             let filename = tmparr[tmparr.length - 1];
             filepath = video_arr[i].name + '/' + filename;
