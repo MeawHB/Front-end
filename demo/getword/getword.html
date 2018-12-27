@@ -19,27 +19,55 @@
     <textarea name="" id="right"></textarea>
 </div>
 <div>
-
 </div>
 <script>
+
+    function exist(char) {
+        let biaodian = [' ', ',', '，', '.', '。', '\n', '"', '“'];
+        let flag = false;
+        for (let i = 0; i < biaodian.length; i++) {
+            if (char === biaodian[i]) {
+                flag = true;
+                break
+            }
+        }
+        return flag
+    }
+
+    //textarea内容改变触发
     $("#left").on('change', function () {
         $("#etext").html("");
         let tmpText = $("#left").val();
-        let tmpArr = tmpText.split(' ');
-        console.log(tmpArr);
-        for (let i = 0; i < tmpArr.length; i++) {
-            let str = '<span>' + tmpArr[i] + '</span>' + ' ';
-            $("#etext").append(str)
+        let word = '';
+        for (let i = 0; i < tmpText.length; i++) {
+            if (exist(tmpText[i])) {
+                //单词加上<span>标签 方便后面mouseover获取
+                if (word) {
+                    $("#etext").append('<span>' + word + '</span>');
+                    word = ''
+                }
+                //回车替换成</br> 其他标点原样添加
+                if (tmpText[i] === '\n') {
+                    $("#etext").append('<br>')
+                } else {
+                    $("#etext").append(tmpText[i])
+                }
+            } else {
+                word = word + tmpText[i]
+            }
         }
         $("#right").val($("#etext").html())
     });
+
+    //鼠标移入 变色
     $("#etext").on('mouseover', 'span', function () {
         $(this).css("background-color", 'green');
         $("#dict").text($(this).text())
     });
+
+    //鼠标移出 恢复
     $("#etext").on('mouseleave', 'span', function () {
         $(this).css("background-color", "transparent");
-        console.log('levae')
     })
 
 </script>
