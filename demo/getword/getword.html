@@ -40,6 +40,7 @@
         let tmpText = $("#left").val();
         let word = '';
         for (let i = 0; i < tmpText.length; i++) {
+            //如果发现标点，处理
             if (exist(tmpText[i])) {
                 //单词加上<span>标签 方便后面mouseover获取
                 if (word) {
@@ -53,6 +54,7 @@
                     $("#etext").append(tmpText[i])
                 }
             } else {
+                //没有标点，拼接单词
                 word = word + tmpText[i]
             }
         }
