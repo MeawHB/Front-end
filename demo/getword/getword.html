@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="public/jquery-3.3.1.min.js"></script>
+    <style>
+        textarea {
+            height: 500px;
+            width: 49%;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <p id="etext"></p>
+    <p id="dict"></p>
+    <textarea name="" id="left"></textarea>
+    <textarea name="" id="right"></textarea>
+</div>
+<div>
+
+</div>
+<script>
+    $("#left").on('change', function () {
+        $("#etext").html("");
+        let tmpText = $("#left").val();
+        let tmpArr = tmpText.split(' ');
+        console.log(tmpArr);
+        for (let i = 0; i < tmpArr.length; i++) {
+            let str = '<span>' + tmpArr[i] + '</span>' + ' ';
+            $("#etext").append(str)
+        }
+        $("#right").val($("#etext").html())
+    });
+    $("#etext").on('mouseover', 'span', function () {
+        $(this).css("background-color", 'green');
+        $("#dict").text($(this).text())
+    });
+    $("#etext").on('mouseleave', 'span', function () {
+        $(this).css("background-color", "transparent");
+        console.log('levae')
+    })
+
+</script>
+</body>
+</html>
