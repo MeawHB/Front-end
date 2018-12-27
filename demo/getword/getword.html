@@ -4,24 +4,55 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="public/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="public/bootstrap.css">
     <style>
-        textarea {
-            height: 500px;
-            width: 49%;
+        .mypadding{
+            padding-left: 0;
+            padding-right: 0;
+            /*padding: 0px;*/
+        }
+        .mymargin{
+            margin:0;
         }
     </style>
 </head>
 <body>
-<div>
-    <p id="etext"></p>
-    <p id="dict"></p>
-    <textarea name="" id="left"></textarea>
-    <textarea name="" id="right"></textarea>
-</div>
-<div>
-</div>
-<script>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="col-lg-8 mypadding">
+            <textarea id="left" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="col-lg-4 mypadding">
+            <textarea id="right" class="form-control" rows="3"></textarea>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="col-lg-8 mypadding">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">原文</h3>
+                </div>
+                <div class="panel-body bg-success">
+                    <p id="etext">英文文本</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mypadding">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">解释</h3>
+                </div>
+                <div class="panel-body bg-success">
+                    <p id="dict"> 翻译解释</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
+</div>
+
+<script>
+    //判断是否是标点
     function exist(char) {
         let biaodian = [' ', ',', '，', '.', '。', '\n', '"', '“'];
         let flag = false;
@@ -34,8 +65,8 @@
         return flag
     }
 
-    //textarea内容改变触发
-    $("#left").on('change', function () {
+    //textarea鼠标离开触发
+    $("#left").on('mouseleave', function () {
         $("#etext").html("");
         let tmpText = $("#left").val();
         let word = '';
@@ -56,6 +87,10 @@
             } else {
                 //没有标点，拼接单词
                 word = word + tmpText[i]
+                //如果最后不是标点，需要输出最后的单词
+                if(i===(tmpText.length-1) && word){
+                    $("#etext").append('<span>' + word + '</span>');
+                }
             }
         }
         $("#right").val($("#etext").html())
@@ -63,13 +98,13 @@
 
     //鼠标移入 变色
     $("#etext").on('mouseover', 'span', function () {
-        $(this).css("background-color", 'green');
+        $(this).addClass('bg-primary');
         $("#dict").text($(this).text())
     });
 
     //鼠标移出 恢复
     $("#etext").on('mouseleave', 'span', function () {
-        $(this).css("background-color", "transparent");
+        $(this).removeClass('bg-primary');
     })
 
 </script>
