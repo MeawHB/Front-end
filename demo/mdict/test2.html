@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<video id="sound" width="200" controls="controls"></video>
+
+<script src="public/speex/bitstring.js"></script>
+<script src="public/speex/pcmdata.min.js"></script>
+<script src="public/speex/speex.js"></script>
+<script src="./public/jquery-3.3.1.min.js"></script>
+<script>
+    /**
+     * @param bufSpx ArrayBuffer (Uint8Array) holding content of speex file (*.spx or *.ogg)
+     */
+    function decodeFile(bufSpx) {
+        var stream, samples, st;
+        var ogg, header, err;
+
+        ogg = new Ogg(bufSpx, {file: true});
+        ogg.demux();
+        stream = ogg.bitstream();
+
+        header = Speex.parseHeader(ogg.frames[0]);
+        console.log(header);
+
+        comment = new SpeexComment(ogg.frames[1]);
+        console.log(comment.data);
+
+        st = new Speex({
+            quality: 8,
+            mode: header.mode,
+            rate: header.rate
+        });
+
+        samples = st.decode(stream, ogg.segments);
+
+        var waveData = PCMData.encode({
+            sampleRate: header.rate,
+            channelCount: header.nb_channels,
+            bytesPerSample: 2,
+            data: samples
+        });
+        // return waveData
+// array buffer holding audio data in wav codec
+        var bufWav = Speex.util.str2ab(waveData);
+// convert to a blob object
+        var blob = new Blob([bufWav], {type: "audio/wav"});
+// return a "blob://" url which can be used as a href anywhere
+        return URL.createObjectURL(blob);
+    }
+
+    function getSpx() {
+        $.ajax({
+            type: "post",
+            url: '/public/o8/us/abdomen__gb_1.spx',
+            dataType:'text',
+            success: function(ogg) {
+                console.log('ogg')
+                // console.log('ogg',ogg)
+                var buffer = new Uint8Array(ogg);
+                // console.log('buffer',buffer)
+                var decoded = decodeFile(ogg);
+                console.log('decoded',decoded)
+                console.log(decoded);
+                $("#sound").attr("src", decoded);
+            }
+        })
+    }
+    getSpx()
+</script>
+</body>
+</html>

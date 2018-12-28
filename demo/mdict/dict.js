@@ -23,6 +23,29 @@ http
                 }
                 res.end(data)
             })
+        }else if (url_path.indexOf('/spx') === 0) {
+            fs.readFile('./public/o8/us/abdomen__gb_1.spx', function (err, data) {
+                if (err) {
+                    return res.end('404 Not Found.')
+                }
+                let base64str = Buffer.from(data, 'binary').toString('base64')
+                res.writeHead(200, {'Content-Type': 'application/text'});
+                res.end(base64str)
+            })
+        }else if (url_path.indexOf('/test') === 0) {
+            fs.readFile('./test.html', function (err, data) {
+                if (err) {
+                    return res.end('404 Not Found.')
+                }
+                res.end(data)
+            })
+        } else if (url_path.indexOf('/t2') === 0) {
+            fs.readFile('./test2.html', function (err, data) {
+                if (err) {
+                    return res.end('404 Not Found.')
+                }
+                res.end(data)
+            })
         } else if (url_path.indexOf('/word') === 0) {
             var data = '';
             req.on('data', function (chunk) {
