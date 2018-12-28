@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="public/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="public/bootstrap.css">
+    <style>
+        .mypadding {
+            padding-left: 0;
+            padding-right: 0;
+            /*padding: 0px;*/
+        }
+
+        .mymargin {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="col-lg-8 mypadding">
+            <textarea id="left" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="col-lg-4 mypadding">
+            <textarea id="right" class="form-control" rows="3"></textarea>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="col-lg-8 mypadding">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">原文</h3>
+                </div>
+                <div class="panel-body bg-success">
+                    <p id="etext">英文文本</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mypadding">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">解释</h3>
+                </div>
+                <div class="panel-body bg-success">
+                    <p id="dict"> 翻译解释</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<a type="audio/ogg; codecs=speex" topic="g/gra/grade/grade__us_1.spx" resource="us_pron" backup-class="Media"
+   class="fayin" href="public/o8/us/grade__us_1.spx"><img src="public/o8/us_pron.png" class="fayin"/></a>
+
+<script>
+    //判断是否是标点
+    function exist(char) {
+        let biaodian = [' ', ',', '，', '.', '。', '\n', '"', '“', '?', , '？'];
+        let flag = false;
+        for (let i = 0; i < biaodian.length; i++) {
+            if (char === biaodian[i]) {
+                flag = true;
+                break
+            }
+        }
+        return flag
+    }
+
+    //textarea鼠标离开触发
+    $("#left").on('mouseleave', function () {
+        $("#etext").html("");
+        let tmpText = $("#left").val();
+        let word = '';
+        for (let i = 0; i < tmpText.length; i++) {
+            //如果发现标点，处理
+            if (exist(tmpText[i])) {
+                //单词加上<span>标签 方便后面mouseover获取
+                if (word) {
+                    $("#etext").append('<span>' + word + '</span>');
+                    word = ''
+                }
+                //回车替换成</br> 其他标点原样添加
+                if (tmpText[i] === '\n') {
+                    $("#etext").append('<br>')
+                } else {
+                    $("#etext").append(tmpText[i])
+                }
+            } else {
+                //没有标点，拼接单词
+                word = word + tmpText[i];
+                //如果最后不是标点，需要输出最后的单词
+                if (i === (tmpText.length - 1) && word) {
+                    $("#etext").append('<span>' + word + '</span>');
+                }
+            }
+        }
+        $("#right").val($("#etext").html())
+    });
+
+    //鼠标移入 变色
+    $("#etext").on('mouseover', 'span', function () {
+        $(this).addClass('bg-primary');
+        // $("#dict").text($(this).text())
+        getDefinitions($(this).text())
+    });
+
+    //鼠标移出 恢复
+    $("#etext").on('mouseleave', 'span', function () {
+        $(this).removeClass('bg-primary');
+    });
+
+    function getDefinitions(word) {
+        $.ajax({
+            type: "POST",
+            url: '/word',
+            data: {word: word},
+            dataType: "json",
+            success: function (result) {
+                console.log('ajax----result: ', result);
+                $("#dict").html(result.definitions)
+            }
+        })
+    }
+
+
+</script>
+</body>
+</html>
