@@ -23,7 +23,17 @@ http
                 }
                 res.end(data)
             })
-        }else if (url_path.indexOf('/spx') === 0) {
+        } else if (url_path.indexOf('/s2') === 0) {
+            fs.readFile('./public/o8/us/abdomen__gb_1.spx', function (err, data) {
+                if (err) {
+                    return res.end('404 Not Found.')
+                }
+                let obj = {data:data}
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify(obj))
+            })
+        }
+        else if (url_path.indexOf('/spx') === 0) {
             fs.readFile('./public/o8/us/abdomen__gb_1.spx', function (err, data) {
                 if (err) {
                     return res.end('404 Not Found.')

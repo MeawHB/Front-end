@@ -56,14 +56,14 @@
     function getSpx() {
         $.ajax({
             type: "post",
-            url: '/public/o8/us/abdomen__gb_1.spx',
-            dataType:'text',
-            success: function(ogg) {
-                console.log('ogg')
-                // console.log('ogg',ogg)
-                var buffer = new Uint8Array(ogg);
+            url: '/s2',
+            dataType:'json',
+            success: function(data) {
+                console.log('data',data)
+                console.log('data.data.data',data.data.data)
+                // var buffer = new Uint8Array(data.data.data);
                 // console.log('buffer',buffer)
-                var decoded = decodeFile(ogg);
+                var decoded = decodeFile(data.data);
                 console.log('decoded',decoded)
                 console.log(decoded);
                 $("#sound").attr("src", decoded);
