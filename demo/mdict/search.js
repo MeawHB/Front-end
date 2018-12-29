@@ -6,7 +6,7 @@ async function search(word, dictname) {
     let dict = await mdict.dictionary('./mdx/' + dictname);
     let words = await dict.search({
         phrase: word,
-        max: 10
+        max: 5
     });
     let definitions = await dict.lookup(words[0]);
 
@@ -22,9 +22,11 @@ async function search(word, dictname) {
         //图片处理
         definitions = definitions.replace(/src="\/thumb/g, 'src="public/o8/thumb');
         definitions = definitions.replace(/src="\/pic/g, 'src="public/o8/pic');
+        //symbols文件夹
+        definitions = definitions.replace(/src="\/symbols/g, 'src="public/o8/symbols');
         //去除link标签，不然页面每次载入都会抖动
         definitions = definitions.replace(/<link.*?>/g, '');
-        console.log(definitions)
+        // console.log(definitions)
     }
 
     // console.log(words);

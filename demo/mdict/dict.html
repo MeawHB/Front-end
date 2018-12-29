@@ -11,8 +11,7 @@
     <!--先引用 不然页面会抖动-->
     <link rel="stylesheet" type="text/css" href="public/o8.css">
     <style>
-        <!--
-        右边滚动条显示-- >
+        /*右边滚动条显示*/
         html {
             overflow-y: scroll;
         }
@@ -26,22 +25,20 @@
 <body>
 
 <nav>
-    <div class="nav-wrapper blue-grey darken-1">
-        <a href="#" class="brand-logo center">Logo</a>
+    <div class="nav-wrapper green darken-2">
+        <ul class="nav-mobile right hide-on-med-and-down">
+            <li><a href="#" id="textarea">显示文本框</a></li>
+        </ul>
         <ul id="nav-mobile" class="left hide-on-med-and-down">
-            <li><a href="sass.html">Sass</a></li>
-            <li><a href="badges.html">组件</a></li>
-            <li><a href="collapsible.html">JavaScript</a></li>
+            <li><a href="">Sass</a></li>
+            <li><a href="">组件</a></li>
+            <li><a href="">JavaScript</a></li>
         </ul>
     </div>
 </nav>
 
 <div class="row">
-    <div class="col s1">
-        <textarea id="left" rows="3"></textarea>
-    </div>
-</div>
-<div class="row">
+    <!--处理后的文本-->
     <div class="col s6">
         <div class="card green lighten-4">
             <div class="card-content black-text">
@@ -49,19 +46,27 @@
             </div>
         </div>
     </div>
-    <div class="col s4">
+    <!--解释-->
+    <div class="col s5">
         <div class="card green lighten-4">
+            <p class="black-text green lighten-3">牛津8双解</p>
             <div class="card-content black-text">
-                <div id="dict" class="col-lg-8 bg-success">英文文本</div>
+                <div id="dict">英文文本</div>
             </div>
         </div>
     </div>
-    <div class="col s2">
+    <!--单词-->
+    <div class="col s1">
+        <div>
+            <!--复制的文本-->
+            <textarea id="left" rows="3" style="display: none"></textarea>
+        </div>
         <div class="card green lighten-4">
             <div class="card-content black-text">
-                <div id="word" class="col-lg-8 bg-success">英文文本</div>
+                <div id="word">英文文本</div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -97,8 +102,8 @@
         return flag
     }
 
-    //textarea鼠标离开触发
-    $("#left").on('mouseleave', function () {
+    //textarea失去焦点
+    $("#left").on('blur', function () {
         $("#etext").html("");
         let tmpText = $("#left").val();
         let word = '';
@@ -129,16 +134,29 @@
     });
 
 
+    let searchflag = true
+
+    $(document).keydown(function(event){
+        //空格 32
+        if(event.keyCode === 32){
+            event.preventDefault()
+            searchflag = !searchflag
+        }
+    });
+    //searchflag
     //鼠标移入 变色
     $("#etext").on('mouseover', 'span', function () {
-        $(this).addClass('bg-primary');
+        $(this).addClass('blue');
         // $("#dict").text($(this).text())
-        getDefinitions($(this).text())
+        if(searchflag){
+            //获取解释
+            getDefinitions($(this).text())
+        }
     });
 
     //鼠标移出 恢复
     $("#etext").on('mouseleave', 'span', function () {
-        $(this).removeClass('bg-primary');
+        $(this).removeClass('blue');
     });
 
     //获取单词解释
@@ -150,7 +168,13 @@
             dataType: "json",
             success: function (result) {
                 console.log('ajax----result: ', result);
+                //显示
                 $("#dict").html(result.definitions);
+                //读音
+                if($(".fayin").length>0){
+                    $(".fayin")[0].click()
+                }
+                //相近单词
                 $("#word").html("");
                 console.log(result.words);
                 for (let i = 0; i < result.words.length; i++) {
@@ -235,6 +259,37 @@
         })
     }
 
+    //点击显示文本框 textareaflag
+    // let textareaflag = true
+    // $("#textarea").on('click',function (e) {
+    //     e.preventDefault()
+    //     if(textareaflag){
+    //         $("#left").css('display','block')
+    //         $("#left").focus()
+    //         $("#left").select();
+    //
+    //     }else{
+    //         $("#left").blur()
+    //         $("#left").css('display','none')
+    //     }
+    //     textareaflag = !textareaflag
+    // })
+
+    //移入显示
+    $("#textarea").on('mouseover',function (e) {
+        e.preventDefault()
+        $("#left").css('display','block')
+        $("#left").focus()
+        $("#left").select();
+
+    })
+    //移出消失
+    $("#textarea").on('mouseleave',function (e) {
+        e.preventDefault()
+        $("#left").blur()
+        $("#left").css('display','none')
+
+    })
 
 </script>
 </body>
