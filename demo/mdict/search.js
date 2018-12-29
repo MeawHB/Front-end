@@ -22,6 +22,8 @@ async function search(word, dictname) {
         //图片处理
         definitions = definitions.replace(/src="\/thumb/g, 'src="public/o8/thumb');
         definitions = definitions.replace(/src="\/pic/g, 'src="public/o8/pic');
+        //去除link标签，不然页面每次载入都会抖动
+        definitions = definitions.replace(/<link.*?>/g, '');
         console.log(definitions)
     }
 

@@ -17,7 +17,6 @@ http
                 res.end(data)
             })
         } else if (url_path.indexOf('/public') === 0) {
-
             fs.readFile('.' + url_path, function (err, data) {
                 if (err) {
                     return res.end('404 Not Found.')

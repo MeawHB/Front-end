@@ -7,58 +7,82 @@
     <script src="public/speex/pcmdata.min.js"></script>
     <script src="public/speex/speex.js"></script>
     <script src="public/jquery-3.3.1.min.js"></script>
-    <link rel="stylesheet" href="public/bootstrap.css">
+    <link rel="stylesheet" href="public/materialize/css/materialize.min.css">
+    <!--先引用 不然页面会抖动-->
+    <link rel="stylesheet" type="text/css" href="public/o8.css">
     <style>
-        .mypadding {
-            padding-left: 0;
-            padding-right: 0;
-            /*padding: 0px;*/
+        <!--
+        右边滚动条显示-- >
+        html {
+            overflow-y: scroll;
         }
 
-        .mymargin {
+        * {
+            padding: 0;
             margin: 0;
         }
     </style>
 </head>
 <body>
-<div class="row">
-    <div class="col-lg-12">
-        <div class="col-lg-8 mypadding">
-            <textarea id="left" class="form-control" rows="3"></textarea>
-        </div>
-        <div class="col-lg-4 mypadding">
-            <textarea id="right" class="form-control" rows="3"></textarea>
-        </div>
-    </div>
-    <div class="col-lg-12">
-        <div class="col-lg-8 mypadding">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">原文</h3>
-                </div>
-                <div class="panel-body bg-success">
-                    <div id="etext">英文文本</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 mypadding">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">牛高8</h3>
-                </div>
-                <div class="panel-body bg-success">
-                    <div id="dict">翻译解释</div>
-                </div>
-            </div>
-        </div>
-    </div>
 
+<nav>
+    <div class="nav-wrapper blue-grey darken-1">
+        <a href="#" class="brand-logo center">Logo</a>
+        <ul id="nav-mobile" class="left hide-on-med-and-down">
+            <li><a href="sass.html">Sass</a></li>
+            <li><a href="badges.html">组件</a></li>
+            <li><a href="collapsible.html">JavaScript</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="row">
+    <div class="col s1">
+        <textarea id="left" rows="3"></textarea>
+    </div>
+</div>
+<div class="row">
+    <div class="col s6">
+        <div class="card green lighten-4">
+            <div class="card-content black-text">
+                <div id="etext" class="col-lg-8 bg-success">英文文本</div>
+            </div>
+        </div>
+    </div>
+    <div class="col s4">
+        <div class="card green lighten-4">
+            <div class="card-content black-text">
+                <div id="dict" class="col-lg-8 bg-success">英文文本</div>
+            </div>
+        </div>
+    </div>
+    <div class="col s2">
+        <div class="card green lighten-4">
+            <div class="card-content black-text">
+                <div id="word" class="col-lg-8 bg-success">英文文本</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
+<!--<div class="container">-->
+<!--<div class="row">-->
+<!--<div class="col-lg-3">-->
+<!--<textarea id="left" rows="3"></textarea>-->
+<!--</div>-->
+<!--<div class="col-lg-3" style="display: none">-->
+<!--<textarea id="right" rows="3"></textarea>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="row">-->
+<!--<div id="etext1" class="col-lg-8 bg-success">英文文本</div>-->
+<!--<div id="dict1" class="col-lg-4 bg-success">翻译解释</div>-->
+<!--</div>-->
+<!--</div>-->
+
+
 <audio id="sound" width="200" autoplay="autoplay"></audio>
-
-
 <script>
     //判断是否是标点
     function exist(char) {
@@ -101,7 +125,7 @@
                 }
             }
         }
-        $("#right").val($("#etext").html())
+        // $("#right").val($("#etext").html())
     });
 
 
@@ -126,11 +150,17 @@
             dataType: "json",
             success: function (result) {
                 console.log('ajax----result: ', result);
-                $("#dict").html(result.definitions)
+                $("#dict").html(result.definitions);
+                $("#word").html("");
+                console.log(result.words);
+                for (let i = 0; i < result.words.length; i++) {
+                    $("#word").append('<p>' + (i + 1) + '. ' + result.words[i] + '</p>')
+                }
             }
         })
     }
 
+    //语音文件修标签 释义内跳转标签
     $("#dict").on('click', 'a', function (e) {
         e.preventDefault();
         console.log($(this).attr('href'));
@@ -158,10 +188,10 @@
         stream = ogg.bitstream();
 
         header = Speex.parseHeader(ogg.frames[0]);
-        console.log(header);
+        console.log('header ', header);
 
         let comment = new SpeexComment(ogg.frames[1]);
-        console.log(comment.data);
+        console.log('comment.data', comment.data);
 
         st = new Speex({
             quality: 8,
@@ -204,8 +234,6 @@
             }
         })
     }
-
-
 
 
 </script>
