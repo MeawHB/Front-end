@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<video id="sound" width="200" controls="controls"></video>
+<audio id="sound" width="200" controls="controls"></audio>
 
 <script src="public/speex/bitstring.js"></script>
 <script src="public/speex/pcmdata.min.js"></script>
@@ -27,7 +27,7 @@
             header = Speex.parseHeader(ogg.frames[0]);
             console.log(header);
 
-            comment = new SpeexComment(ogg.frames[1]);
+            let comment = new SpeexComment(ogg.frames[1]);
             console.log(comment.data);
 
             st = new Speex({
@@ -59,11 +59,11 @@
                 url: '/spx',
                 dataType:'text',
                 success: function(ogg) {
-                    console.log('ogg',ogg)
+                    console.log('ogg', ogg);
                     var buffer = atob(ogg);
-                    console.log('buffer',buffer)
+                    console.log('buffer', buffer);
                     var decoded = decodeFile(buffer);
-                    console.log('decoded',decoded)
+                    console.log('decoded', decoded);
                     console.log(decoded);
                     $("#sound").attr("src", decoded);
                 }
