@@ -6,7 +6,7 @@ async function search(word, dictname) {
     let dict = await mdict.dictionary('./mdx/' + dictname);
     let words = await dict.search({
         phrase: word,
-        max: 5
+        max: 20
     });
     let definitions = await dict.lookup(words[0]);
 

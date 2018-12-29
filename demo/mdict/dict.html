@@ -8,6 +8,7 @@
     <script src="public/speex/speex.js"></script>
     <script src="public/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" href="public/materialize/css/materialize.min.css">
+    <script src="public/materialize/js/materialize.min.js"></script>
     <!--先引用 不然页面会抖动-->
     <link rel="stylesheet" type="text/css" href="public/o8.css">
     <style>
@@ -27,9 +28,15 @@
 <nav>
     <div class="nav-wrapper green darken-2">
         <ul class="nav-mobile right hide-on-med-and-down">
+            <li><a href="#">搜索</a></li>
             <li><a href="#" id="textarea">显示文本框</a></li>
         </ul>
-        <ul id="nav-mobile" class="left hide-on-med-and-down">
+        <!--<ul class="nav-mobile right hide-on-med-and-down">-->
+            <!--<input id="icon_prefix" type="text" class="validate input-field col s1 green darken-1">-->
+        <!--</ul>-->
+
+        <!--<input type="text" class="inline">-->
+        <ul id="nav-mobile" class="left hide-o n-med-and-down">
             <li><a href="">Sass</a></li>
             <li><a href="">组件</a></li>
             <li><a href="">JavaScript</a></li>
@@ -42,7 +49,7 @@
     <div class="col s6">
         <div class="card green lighten-4">
             <div class="card-content black-text">
-                <div id="etext" class="col-lg-8 bg-success">英文文本</div>
+                <div id="etext" class="">英文文本</div>
             </div>
         </div>
     </div>
@@ -91,7 +98,7 @@
 <script>
     //判断是否是标点
     function exist(char) {
-        let biaodian = [' ', ',', '，', '.', '。', '\n', '"', '“', '?', , '？'];
+        let biaodian = [' ', ',', '，', '.', '。', '\n', '"', '“', '?', , '？', '!', '！'];
         let flag = false;
         for (let i = 0; i < biaodian.length; i++) {
             if (char === biaodian[i]) {
