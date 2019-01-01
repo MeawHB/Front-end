@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="public/bootstrap-4.2.1-dist/css/bootstrap.min.css">
     <script src="public/speex/bitstring.js"></script>
     <script src="public/speex/pcmdata.min.js"></script>
     <script src="public/speex/speex.js"></script>
-    <script src="public/jquery-3.3.1.min.js"></script>
-    <link rel="stylesheet" href="public/materialize/css/materialize.min.css">
-    <script src="public/materialize/js/materialize.min.js"></script>
+    <script src="public/bootstrap-4.2.1-dist/jquery-3.3.1.min.js"></script>
+    <script src="public/bootstrap-4.2.1-dist/popper.min.js"></script>
+    <script src="public/bootstrap-4.2.1-dist/js/bootstrap.min.js"></script>
+
     <!--先引用 不然页面会抖动-->
     <link rel="stylesheet" type="text/css" href="public/o8.css">
     <style>
@@ -17,81 +19,51 @@
             overflow-y: scroll;
         }
 
-        * {
-            padding: 0;
-            margin: 0;
+        /*背景色*/
+        .bg-green-l3 {
+            background-color: #a5d6a7;
         }
+        .bg-green-l4 {
+            background-color: #c8e6c9;
+        }
+        .bg-green-l5 {
+            background-color: #e8f5e9;
+        }
+
+        body {
+            background-color: #e8f5e9;
+        }
+
     </style>
 </head>
 <body>
 
-<nav>
-    <div class="nav-wrapper green darken-2">
-        <ul class="nav-mobile right hide-on-med-and-down">
-            <li><a href="#">搜索</a></li>
-            <li><a href="#" id="textarea">显示文本框</a></li>
-        </ul>
-        <!--<ul class="nav-mobile right hide-on-med-and-down">-->
-            <!--<input id="icon_prefix" type="text" class="validate input-field col s1 green darken-1">-->
-        <!--</ul>-->
 
-        <!--<input type="text" class="inline">-->
-        <ul id="nav-mobile" class="left hide-o n-med-and-down">
-            <li><a href="">Sass</a></li>
-            <li><a href="">组件</a></li>
-            <li><a href="">JavaScript</a></li>
-        </ul>
-    </div>
-</nav>
+<a href="#" id="textarea">显示文本框</a>
 
-<div class="row">
-    <!--处理后的文本-->
-    <div class="col s6">
-        <div class="card green lighten-4">
-            <div class="card-content black-text">
-                <div id="etext" class="">英文文本</div>
+<div class="container-fluid">
+    <div class="row">
+        <!--处理后的文本-->
+        <div class="col-md-6 m-0 p-0">
+             <div id="etext" class="bg-green-l4">英文文本</div>
+        </div>
+        <!--解释-->
+        <div class="col-md-5 m-0 p-0">
+            <div class="d-flex flex-column">
+                <div class="bg-green-l3 m-0 p-0">牛津8双解</div>
+                <div id="dict" class="bg-green-l4 m-0 p-0">英文文本</div>
             </div>
         </div>
-    </div>
-    <!--解释-->
-    <div class="col s5">
-        <div class="card green lighten-4">
-            <p class="black-text green lighten-3">牛津8双解</p>
-            <div class="card-content black-text">
-                <div id="dict">英文文本</div>
+        <!--单词-->
+        <div class="col-md-1 m-0 p-0">
+            <div>
+                <!--复制的文本-->
+                <textarea id="left" rows="3" class="bg-green-l5"></textarea>
             </div>
+            <div id="word" class="bg-green-l4">英文文本</div>
         </div>
-    </div>
-    <!--单词-->
-    <div class="col s1">
-        <div>
-            <!--复制的文本-->
-            <textarea id="left" rows="3" style="display: none"></textarea>
-        </div>
-        <div class="card green lighten-4">
-            <div class="card-content black-text">
-                <div id="word">英文文本</div>
-            </div>
-        </div>
-
     </div>
 </div>
-
-
-<!--<div class="container">-->
-<!--<div class="row">-->
-<!--<div class="col-lg-3">-->
-<!--<textarea id="left" rows="3"></textarea>-->
-<!--</div>-->
-<!--<div class="col-lg-3" style="display: none">-->
-<!--<textarea id="right" rows="3"></textarea>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="row">-->
-<!--<div id="etext1" class="col-lg-8 bg-success">英文文本</div>-->
-<!--<div id="dict1" class="col-lg-4 bg-success">翻译解释</div>-->
-<!--</div>-->
-<!--</div>-->
 
 
 <audio id="sound" width="200" autoplay="autoplay"></audio>
