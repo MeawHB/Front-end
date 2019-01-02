@@ -45,8 +45,13 @@ http
             req.on('end', function () {
                 data = decodeURI(data);
                 var dataObject = querystring.parse(data);
-                search(dataObject.word, 'o8.mdx')
-
+                if (dataObject.dict === 'o8') {
+                    search(dataObject.word, 'o8.mdx')
+                } else if (dataObject.dict === 'o2') {
+                    search(dataObject.word, 'o2.mdx')
+                } else if (dataObject.dict === 'o1') {
+                    search(dataObject.word, 'o1.mdx')
+                }
             });
 
             async function search(word, d) {

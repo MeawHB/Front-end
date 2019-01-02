@@ -1,0 +1,429 @@
+.word-explain {
+    /*line-height: 28px;*/
+}
+
+.word-pinyin {
+    /*padding-bottom: 10px;*/
+    font-size: 14px
+}
+
+.word-ex-index {
+    color: #A2A2A2;
+}
+
+.words {
+    color: #1464aa;
+    /*font-weight: normal;*/
+}
+
+.scbadd {
+    /*top: 16px;*/
+    /*right: 14px;*/
+}
+
+.cont-list {
+    position: relative;
+}
+
+.cont-pos {
+    position: absolute;
+    left: 0;
+    text-align: right;
+    display: inline-block;
+    width: 20px;
+}
+
+.cont-pos span {
+    font-weight: bold;
+}
+
+.content {
+    /*margin-bottom: 10px;*/
+}
+
+.content dl, .cont-pos-other, .word-explain dl {
+    padding-left: 25px;
+}
+
+.content dt span {
+    font-family: 'Haici Dict', auto;
+    font-size: 10px; /*color: #1464aa;*/
+}
+
+.ui-navigator-list li a {
+    font-size: 14px;
+    color: #9F9F9F;
+}
+
+.ui-navigator-list li.ui-state-hover,
+.ui-navigator-list li.ui-state-active {
+    border-bottom: 1px solid #1464aa;
+}
+
+.ui-navigator-list li.ui-state-hover a,
+.ui-navigator-list li.ui-state-active a {
+    color: #1464aa;
+}
+
+em {
+    font-weight: bold;
+    font-style: normal;
+}
+
+em1 {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+em2 {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+i {
+    font-style: italic;
+}
+
+.cont-pos-other {
+    /*padding-bottom: 10px;*/
+    display: none;
+}
+
+.cont-pos-other-symbol, .cont-pos-other-ext {
+    display: block;
+}
+
+.word-ex-index {
+    position: absolute;
+    left: 0;
+}
+
+.word-ex {
+    position: relative;
+}
+
+.word-ex-cont {
+    padding-left: 18px;
+}
+
+.word-ex-cont.word-ex-contx {
+    padding-left: 0;
+}
+
+.cont-img-src {
+    padding-left: 30px;
+    width: 240px;
+    /*min-height: 168px;*/
+}
+
+.cont-img-title {
+    text-align: center;
+    /*padding-bottom: 15px;*/
+}
+
+.cont-img-src img {
+    width: 240px;
+    border: 0;
+}
+
+.word-img {
+    padding-left: 18px;
+    width: 240px;
+    /*min-height: 168px;*/
+}
+
+.word-img-pic img {
+    width: 240px;
+    border: 0;
+}
+
+.word-img-title {
+    text-align: center;
+    /*padding-bottom: 15px;*/
+}
+
+.cont-tips {
+    /*padding-bottom: 20px;*/
+}
+
+.cont-tips-tag {
+    background: #14A8C8;
+    color: #fff;
+    width: 70px;
+    text-align: center;
+    /*margin-bottom: 6px;*/
+}
+
+.cont-tips-title {
+    color: #2D2D2D;
+    /*padding-bottom: 4px;*/
+}
+
+.cont-tips-content {
+    color: #aaa;
+    /*line-height: 26px;*/
+}
+
+.cont-phrase {
+    /*padding-bottom: 15px;*/
+}
+
+.cont-phrase-title {
+    background: #FD7778;
+    color: #fff;
+    width: 40px;
+    text-align: center;
+    /*margin-bottom: 6px;*/
+}
+
+.word-derivative {
+    padding-left: 18px;
+}
+
+.word-derivative-tag {
+    color: #666;
+    font-size: 12px;
+}
+
+.cont-list {
+    /*padding-bottom: 3px;*/
+}
+
+.cont-list dt {
+    padding-bottom: 0px;
+}
+
+.content dd {
+    text-indent: 0;
+}
+
+.cont-exam-trans, .sense-dt-def-trans {
+    font-family: 'Haici Dict', auto; /*color:#A3A3A3;*/
+}
+
+.cont-ext {
+    /*padding-bottom: 10px;*/
+}
+
+.ui-navigator-list li a.nav-en {
+    font-size: 14px;
+}
+
+.lab-cont-addscb {
+    display: none;
+}
+
+.cont-img-src {
+    position: relative;
+}
+
+.cont-img-src img.cont-img-def {
+    position: absolute;
+    z-index: 1;
+}
+
+.cont-img-src img.cont-img-real {
+    position: relative;
+    z-index: 2;
+}
+
+.word-img {
+    position: relative;
+}
+
+.word-img img.cont-img-def {
+    position: absolute;
+    z-index: 1;
+}
+
+.word-img img.cont-img-real {
+    position: relative;
+    z-index: 2;
+}
+
+.words-yinbiao i, .word-ex i, .word-explain i {
+    font-style: italic;
+}
+
+.cont-exam-ex i {
+    font-style: italic;
+}
+
+.cont-exam-ex em {
+    font-style: italic;
+}
+
+.cont-exam-ex nl {
+    font-style: normal;
+    font-weight: normal;
+}
+
+.cont-exam-ex nl em {
+    font-style: normal;
+}
+
+.word-ext em {
+    font-style: normal;
+}
+
+.cont-exam p {
+    /*line-height: 20px;*/
+}
+
+.cont-exam {
+    /*padding-bottom: 4px;*/
+}
+
+.cont-exam-ex {
+    font-style: italic;
+    /*padding-bottom: 4px;*/
+}
+
+.cont-exam p.cont-exam-ex {
+    /*line-height: 20px;*/
+}
+
+.cont-ext, .cont-list-pos, .cont-list-ext, .cont-list-grammar {
+    /*padding-bottom: 3px;*/
+}
+
+.cont-addition {
+    /*line-height: 20px;*/
+    /*margin-top: 8px;*/
+    background: #c8e6c9;
+    /*padding: 5px;*/
+}
+
+.cont-addition em {
+    font-style: normal;
+}
+
+.cont-addition i em {
+    font-style: italic;
+}
+
+.cont-addition span {
+    color: #fff;
+    background: #c8e6c9;
+    /*margin-right: 4px;*/
+    /*padding: 0 3px;*/
+}
+
+.main-addition {
+    margin-top: 0;
+}
+
+.spaceh20 {
+    font-size: 0;
+    height: 0;
+    overflow: hidden;
+    /*padding-top: 20px;*/
+}
+
+.spaceh10 {
+    font-size: 0;
+    height: 0;
+    overflow: hidden;
+    /*padding-top: 10px;*/
+}
+
+.marginleft18 {
+    margin-left: 18px;
+}
+
+.label-derivative p {
+    /*line-height: 20px;*/
+}
+
+.label-derivative .cont-exam {
+    /*padding-bottom: 6px;*/
+}
+
+.label-ext span {
+    /*padding-bottom: 4px;*/
+}
+
+.sense-pos, .phrase-pos {
+    color: #0aba7e;
+    font-style: italic;
+}
+
+.phrase-symbol {
+    font-family: "Lucida Sans Unicode", 'Haici Dict', 'STHeiti Medium', auto;
+    color: #D2D2D2;
+}
+
+.content dt div {
+    /*line-height: 22px;*/
+    /*padding-bottom: 4px;*/
+}
+
+.word-origin em {
+    font-style: normal;
+}
+
+.content .cont-exam em {
+    font-weight: bold;
+}
+
+.label-ext em {
+    font-weight: bold;
+}
+
+.phrase-exam dt div {
+    /*line-height: normal;*/
+}
+
+.phrase-exam dt .phrase-exam-trans {
+    padding-top: 2px;
+    /*line-height: 24px;*/
+    font-family: 'Haici Dict', auto;
+}
+
+.phrase-exam .cont-list dt {
+    /*padding-bottom: 6px;*/
+}
+
+.word-origin {
+    /*line-height: normal;*/
+}
+
+.word-origin i {
+    font-style: oblique;
+    font-family: Cambria;
+}
+
+.cont-list-ext {
+    /*line-height: normal;*/
+    /*padding-bottom: 5px;*/
+}
+
+.content dt .sense-dt-def-ex span {
+    font-size: 14px;
+    font-family: 'Haici Dict', auto;
+}
+
+.cont-exam p.cont-exam-trans {
+    /*line-height: 24px;*/
+}
+
+.content dt div.sense-dt-def-trans {
+    /*line-height: 24px;*/
+}
+
+.special {
+    font-family: 'Haici Dict';
+}
+
+.content dt .sense-dt-def-ex .sub-def-ex {
+    font-family: 'Segoe UI Symbol', auto;
+}
+
+.content dt .sense-dt-def-ex .sub-def-ex i {
+    font-style: oblique;
+    color: red
+}
+
+
+
+

@@ -8,6 +8,40 @@ async function search(word, dictname) {
         phrase: word,
         max: 20
     });
+
+    let tmpword = JSON.parse(JSON.stringify(words[0]));
+    console.log('words[:', words);
+    console.log('words[0]:', words[0]);
+    console.log('tmpword:', tmpword);
+    if (tmpword !== word) {
+        //复数s es 过去式d ed
+        if (word.endsWith('s') || word.endsWith('d')) {
+            word = word.substring(0, word.length - 1);
+            words = await dict.search(word, dictname);
+            //es
+            if (tmpword !== word && (word.endsWith('e'))) {
+                word = word.substring(0, word.length - 1);
+                words = await dict.search(word, dictname)
+            }
+            // 's
+            if (tmpword !== word && word.endsWith('\'')) {
+                word = word.substring(0, word.length - 1);
+                words = await dict.search(word, dictname)
+            }
+        }
+        //进行时ing
+        if (word.endsWith('ing')) {
+            word = word.substring(0, word.length - 3);
+            console.log('ing:', word);
+            words = await dict.search(word, dictname);
+            if (tmpword !== word) {
+                word = word + 'e';
+                console.log('e:', word);
+                words = await dict.search(word, dictname)
+            }
+        }
+    }
+
     let definitions = await dict.lookup(words[0]);
 
     if (dictname === 'o8.mdx') {
@@ -28,7 +62,24 @@ async function search(word, dictname) {
         definitions = definitions.replace(/<link.*?>/g, '');
         // console.log(definitions)
     }
+    if (dictname === 'o2.mdx') {
+        //去掉\n\r\n  替换css
+        definitions = definitions[0].replace(/\n\r\n/g, '');
+        //去除link标签，不然页面每次载入都会抖动
+        definitions = definitions.replace(/<link.*?>/g, '');
+        //去除style标签
+        definitions = definitions.replace(/<style.*?<\/style>/g, '');
+        definitions = definitions.replace(/style=".*?"/g, '');
+        // console.log('definitionso2:',definitions);
+    }
 
+    if (dictname === 'o1.mdx') {
+        //去掉\r\n  替换css
+        definitions = definitions[0].replace(/\n\r\n/g, '');
+        //去除link标签，不然页面每次载入都会抖动
+        definitions = definitions.replace(/<link.*?>/g, '');
+        // console.log('definitionso1:',definitions);
+    }
     // console.log(words);
     // console.log(definitions);
     return {

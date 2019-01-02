@@ -13,6 +13,9 @@
 
     <!--先引用 不然页面会抖动-->
     <link rel="stylesheet" type="text/css" href="public/o8.css">
+    <link rel="stylesheet" type="text/css" href="public/o2base.css">
+    <link rel="stylesheet" type="text/css" href="public/o2word.css">
+    <link rel="stylesheet" type="text/css" href="public/o1.css">
     <style>
         /*右边滚动条显示*/
         html {
@@ -30,10 +33,13 @@
             background-color: #e8f5e9;
         }
 
+        .bg-light-green-l1 {
+            background-color: #9ccc65;
+        }
+
         body {
             background-color: #e8f5e9;
         }
-
     </style>
 </head>
 <body>
@@ -47,22 +53,27 @@
         <!--解释-->
         <div class="col-md-5 m-0 p-0">
             <div class="d-flex flex-column m-0 p-0">
-                <div class="m-0 p-0 input-group">
-                    <span class="mx-2">牛津8双解</span>
+                <div class="m-0 p-0 input-group bg-green-l5">
+                    <span class="mx-2" id="dicto8span">牛津8双解</span>
                     <span>|</span>
-                    <span class="mx-2">新牛津2</span>
+                    <span class="mx-2" id="dicto1span">新牛津1</span>
                     <span>|</span>
-                    <input id="wordsearch" type="text" class="mx-2 bg-green-l3 h-100" placeholder="search" style="width: 150px;border:0px;outline:none;">
+                    <span class="mx-2" id="dicto2span">新牛津2</span>
+                    <span>|</span>
+                    <input id="wordsearch" type="text" class="mx-2 bg-green-l3 h-100" placeholder="search"
+                           style="width: 100px;border:0px;outline:none;">
                     <span id="textarea" class="ml-auto mr-2">显示文本框</span>
                 </div>
-                <div id="dict" class="bg-green-l4 m-0 p-0">英文文本</div>
+                <p id="dicto8" class="bg-green-l4 m-0 p-0">英文文本</p>
+                <p id="dicto1" class="bg-green-l4 m-0 p-0">英文文本</p>
+                <p id="dicto2" class="bg-green-l4 m-0 p-0">英文文本</p>
             </div>
         </div>
         <!--单词-->
         <div class="col-md-1 m-0 p-0">
             <div>
                 <!--复制的文本-->
-                <textarea id="left" rows="3" class="bg-green-l5"></textarea>
+                <textarea id="otext" rows="3" class="bg-green-l5"></textarea>
             </div>
             <div id="word" class="bg-green-l4">英文文本</div>
         </div>
@@ -73,23 +84,34 @@
 
 
 <script>
+    //词典名称
+    let dict8 = 'o8';
+    let dict2 = 'o2';
+    let dict1 = 'o1';
+    let searchlastword = "";
+    let searchword = "";
+
     //判断是否是标点
     function exist(char) {
-        let biaodian = [' ', ',', '，', '.', '。', '\n', '"', '“', '?', , '？', '!', '！'];
+        // let biaodian = [' ', ',', '，', '.', '。', '\n', '"', '“', '?', , '？', '!', '！','—',';','；',':'];
         let flag = false;
-        for (let i = 0; i < biaodian.length; i++) {
-            if (char === biaodian[i]) {
-                flag = true;
-                break
-            }
+        let zimu = /[a-zA-Z]/i;
+        if (!zimu.test(char)) {
+            flag = true;
         }
+        // for (let i = 0; i < biaodian.length; i++) {
+        //     if (char === biaodian[i]) {
+        //         flag = true;
+        //         break
+        //     }
+        // }
         return flag
     }
 
     //textarea失去焦点
-    $("#left").on('blur', function () {
+    $("#otext").on('blur', function () {
         $("#etext").html("");
-        let tmpText = $("#left").val();
+        let tmpText = $("#otext").val();
         let word = '';
         for (let i = 0; i < tmpText.length; i++) {
             //如果发现标点，处理
@@ -118,23 +140,37 @@
     });
 
 
-    let searchflag = true
-
+    //空格切换是否查询
+    let searchflag = false;
     $(document).keydown(function(event){
         //空格 32
         if(event.keyCode === 32){
-            event.preventDefault()
+            event.preventDefault();
             searchflag = !searchflag
         }
+        //ctrl 17
+        if (event.keyCode === 17) {
+            //按下ctrl查词
+            if (searchlastword !== searchword) {
+                getDefinitions(searchword, dict8);
+                getDefinitions(searchword, dict1);
+                getDefinitions(searchword, dict2);
+                searchlastword = searchword
+            }
+        }
     });
+
     //searchflag
     //鼠标移入 变色
     $("#etext").on('mouseover', 'span', function () {
         $(this).addClass('bg-success');
         // $("#dict").text($(this).text())
+        searchword = $(this).text();
         if(searchflag){
             //获取解释
-            getDefinitions($(this).text())
+            getDefinitions($(this).text(), dict8);
+            getDefinitions($(this).text(), dict1);
+            getDefinitions($(this).text(), dict2)
         }
     });
 
@@ -144,32 +180,45 @@
     });
 
     //获取单词解释
-    function getDefinitions(word) {
+    function getDefinitions(word, dictname) {
         $.ajax({
             type: "POST",
             url: '/word',
-            data: {word: word},
+            data: {
+                word: word,
+                dict: dictname
+            },
             dataType: "json",
             success: function (result) {
-                console.log('ajax----result: ', result);
+                // console.log('ajax----result: ', result);
                 //显示
-                $("#dict").html(result.definitions);
-                //读音
-                if($(".fayin").length>0){
-                    $(".fayin")[0].click()
+                if (dictname === dict8) {
+                    $("#dicto8").html(result.definitions);
+                    //读音
+                    if ($(".fayin").length > 0) {
+                        $(".fayin")[0].click()
+                    }
+                    //相近单词
+                    $("#word").html("");
+                    console.log(result.words);
+                    for (let i = 0; i < result.words.length; i++) {
+                        $("#word").append('<p class="small p-0 m-0">' + (i + 1) + '. ' + result.words[i] + '</p>')
+                    }
                 }
-                //相近单词
-                $("#word").html("");
-                console.log(result.words);
-                for (let i = 0; i < result.words.length; i++) {
-                    $("#word").append('<p class="small p-0 m-0">' + (i + 1) + '. ' + result.words[i] + '</p>')
+                if (dictname === dict2) {
+                    $("#dicto2").html(result.definitions);
+                    $("#dicto2 *").css('margin', '0px');
+                    $("#dicto2 *").css('font-size', '12px')
+                }
+                if (dictname === dict1) {
+                    $("#dicto1").html(result.definitions);
                 }
             }
         })
     }
 
     //语音文件修标签 释义内跳转标签
-    $("#dict").on('click', 'a', function (e) {
+    $("#dicto8").on('click', 'a', function (e) {
         e.preventDefault();
         console.log($(this).attr('href'));
         let href = $(this).attr('href');
@@ -178,7 +227,7 @@
         }
         if (href.startsWith('entry://')) {
             href = href.substring(8);
-            getDefinitions(href)
+            getDefinitions(href, dict8)
         }
     });
 
@@ -196,10 +245,10 @@
         stream = ogg.bitstream();
 
         header = Speex.parseHeader(ogg.frames[0]);
-        console.log('header ', header);
+        // console.log('header ', header);
 
         let comment = new SpeexComment(ogg.frames[1]);
-        console.log('comment.data', comment.data);
+        // console.log('comment.data', comment.data);
 
         st = new Speex({
             quality: 8,
@@ -232,12 +281,12 @@
             dataType: 'text',
             success: function (ogg) {
                 //base64转回buf
-                console.log('ogg', ogg);
+                // console.log('ogg', ogg);
                 var buffer = atob(ogg);
-                console.log('buffer', buffer);
+                // console.log('buffer', buffer);
                 var decoded = decodeFile(buffer);
                 console.log('decoded', decoded);
-                console.log(decoded);
+                // console.log(decoded);
                 $("#sound").attr("src", decoded);
             }
         })
@@ -248,48 +297,82 @@
     // $("#textarea").on('click',function (e) {
     //     e.preventDefault()
     //     if(textareaflag){
-    //         $("#left").css('display','block')
-    //         $("#left").focus()
-    //         $("#left").select();
+    //         $("#otext").css('display','block')
+    //         $("#otext").focus()
+    //         $("#otext").select();
     //
     //     }else{
-    //         $("#left").blur()
-    //         $("#left").css('display','none')
+    //         $("#otext").blur()
+    //         $("#otext").css('display','none')
     //     }
     //     textareaflag = !textareaflag
     // })
 
     //移入显示
     $("#textarea").on('mouseover',function (e) {
-        e.preventDefault()
-        $("#left").css('display','block')
-        $("#left").focus()
-        $("#left").select();
+        e.preventDefault();
+        $("#otext").css('display', 'block');
+        $("#otext").focus();
+        $("#otext").select();
 
-    })
+    });
     //移出消失
     $("#textarea").on('mouseleave',function (e) {
-        e.preventDefault()
-        $("#left").blur()
-        $("#left").css('display','none')
+        e.preventDefault();
+        $("#otext").blur();
+        $("#otext").css('display', 'none')
 
-    })
+    });
 
     //wordsearchk框查单词
     $("#wordsearch").on('blur',function () {
         if($(this).val()){
-            getDefinitions($(this).val())
+            getDefinitions($(this).val(), dict8);
+            getDefinitions($(this).val(), dict2);
+            getDefinitions($(this).val(), dict1)
         }
-    })
+    });
     $("#wordsearch").keydown(function(event){
         //回车 13
         if(event.keyCode === 13){
             $("#wordsearch").blur()
         }
-    })
+    });
     $("#wordsearch").on('mouseover',function () {
         $(this).select()
+    });
+
+    //切换词典显示
+    $("#dicto8").show();
+    $("#dicto2").hide();
+    $("#dicto1").hide();
+    $("#dicto8span").addClass('bg-light-green-l1');
+
+    $("#dicto8span").on('mouseover', function () {
+        $("#dicto8").show();
+        $("#dicto2").hide();
+        $("#dicto1").hide();
+        $("#dicto8span").addClass('bg-light-green-l1');
+        $("#dicto2span").removeClass('bg-light-green-l1');
+        $("#dicto1span").removeClass('bg-light-green-l1')
+    });
+    $("#dicto2span").on('mouseover', function () {
+        $("#dicto8").hide();
+        $("#dicto2").show();
+        $("#dicto1").hide();
+        $("#dicto8span").removeClass('bg-light-green-l1');
+        $("#dicto2span").addClass('bg-light-green-l1');
+        $("#dicto1span").removeClass('bg-light-green-l1')
+    });
+    $("#dicto1span").on('mouseover', function () {
+        $("#dicto2").hide();
+        $("#dicto1").show();
+        $("#dicto8").hide();
+        $("#dicto8span").removeClass('bg-light-green-l1');
+        $("#dicto1span").addClass('bg-light-green-l1');
+        $("#dicto2span").removeClass('bg-light-green-l1')
     })
+
 
 </script>
 </body>

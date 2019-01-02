@@ -1,0 +1,400 @@
+@charset "utf-8";
+/* reset */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    text-align: left;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+}
+
+.font-sys-dict, body {
+    font-family: 'Roboto-Regular', Helvetica, Arial, sans-serif, 'Haici Dict', auto;
+}
+
+.font-dict-sys {
+    font-family: 'Haici Dict', 'Roboto-Regular', Helvetica, Arial, sans-serif, auto;
+}
+
+.clearfix:after {
+    clear: both;
+    height: 0;
+    overflow: hidden;
+    display: block;
+    visibility: hidden;
+    content: ".";
+}
+
+.clear {
+    clear: both;
+    height: 0;
+    overflow: hidden;
+    font-size: 0;
+}
+
+ul, li {
+    list-style: none;
+}
+
+a {
+    color: #4b4b4b;
+    outline: none;
+}
+
+a:link {
+}
+
+a:visited {
+}
+
+a:hover {
+}
+
+a:active {
+}
+
+img {
+    border: 0;
+}
+
+h3 {
+    font-weight: normal;
+}
+
+i {
+    font-style: normal;
+}
+
+td, div, a, a:hover {
+    /*-webkit-touch-callout: none;*/
+    /*-webkit-user-select: none;*/
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* gum navigator */
+#nav {
+    background: #c8e6c9;
+    /*margin-bottom: 10px;*/
+}
+
+#nav li {
+    float: left;
+}
+
+.ui-navigator-list,
+.ui-navigator-list li {
+    list-style: none;
+}
+
+.ui-navigator-list li {
+    display: inline-block;
+    white-space: nowrap; /*内容不换行*/
+    border-bottom: 1px solid #fff;
+    font-family: 'Times New Roman-Bold', Helvetica, Arial, sans-serif, 'Haici Dict', auto;
+    color: #000;
+}
+
+.ui-navigator-list {
+    width: 100%;
+    display: -webkit-box;
+}
+
+.ui-navigator-list li {
+    /*height: 51px;*/
+    /*line-height: 44px;*/
+    font-size: 14px;
+    text-align: center;
+    -webkit-box-flex: 1;
+    display: -webkit-box;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+}
+
+.ui-navigator-list li a {
+    padding-top: 6px;
+    font-size: 14px;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+}
+
+.ui-navigator-list li.ui-state-hover,
+.ui-navigator-list li.ui-state-active {
+    border-bottom: 1px solid #FE940B;
+}
+
+.ui-scroller {
+    padding: 0;
+    margin: 0;
+    float: left;
+    display: inline-block; /*重要，靠他让宽度由子节点撑开*/
+}
+
+.ui-scroller .ui-navigator-list {
+    display: table;
+    table-layout: fixed; /*宽度可控*/
+    white-space: nowrap; /*内容不换行*/
+    width: auto;
+}
+
+.ui-scroller .ui-navigator-list:after {
+    content: '';
+    clear: both;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.ui-scroller .ui-navigator-list li {
+    display: inline-block;
+    /*float: left;*/
+}
+
+/* gum slider */
+.ui-slider {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    /*-webkit-user-select: none;*/
+    /*-webkit-touch-callout: none;*/
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.ui-slider-group {
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap; /*内容不换行*/
+    -webkit-transform: translateZ(0);
+}
+
+.ui-slider-item {
+    position: relative;
+    float: left;
+    overflow: hidden;
+    -webkit-box-sizing: border-box;
+}
+
+.ui-slider-group .content {
+    white-space: normal;
+}
+
+.ui-navigator-list li sup {
+    font-size: 14px;
+}
+
+/* css3 circle word */
+.circle-word {
+    /*width: 20px;*/
+    /*height: 20px;*/
+    /*line-height: 20px;*/
+    background: #52B231;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #fff;
+    padding-right: 1px;
+    display: inline-block;
+}
+
+/* fixed nav */
+#nav.nav-fixed {
+    position: fixed;
+    z-index: 9999;
+    background: #c8e6c9;
+    top: 0;
+    /*border-top: 10px #F7F7F7 solid;*/
+    /*border-bottom: 10px #F7F7F7 solid;*/
+}
+
+#nav.nav-fixed .ui-navigator-list li {
+    /*height: 50px;*/
+}
+
+/* framework */
+body {
+    color: #444;
+    background: #c8e6c9;
+}
+
+.footer {
+    text-align: center;
+    background: #c8e6c9;
+    padding: 10px 0 20px;
+}
+
+.wordhead, .labelbtn {
+    position: relative;
+}
+
+.wordhead, .main {
+    background: #c8e6c9;
+}
+
+.main {
+    padding-bottom: 0;
+    /*padding: 0 8px 10px;*/
+    word-wrap: normal;
+}
+
+.scbadd, .arrowbtn {
+    position: absolute;
+    right: 8px;
+    /*top: 4px;*/
+}
+
+.arrowbtn {
+    /*right: 10px;*/
+}
+
+.words {
+    width: 88%;
+    word-break: break-word;
+    font-size: 14px;
+    font-family: 'Times New Roman-Bold', Helvetica, Arial, sans-serif, 'Haici Dict', auto;
+    color: #000;
+}
+
+.words sup {
+    font-size: 14px;
+}
+
+.words-yinbiao {
+    font-family: 'Lucida Sans Unicode', 'Haici Dict', 'STHeiti Medium', auto;
+}
+
+.words-yinbiao img {
+    position: relative;
+    /*top: -3px;*/
+}
+
+.words-yinbiao span {
+    color: #D2D2D2;
+    font-size: 14px;
+}
+
+.labelbtn {
+    background: #c8e6c9;
+    /*padding: 0 8px;*/
+    font-size: 14px;
+    /*height: 48px;*/
+    /*line-height: 48px;*/
+    /*margin-bottom: 10px;*/
+}
+
+.labeltitle {
+    position: relative;
+    top: -1px;
+}
+
+.wordhead {
+    display: none;
+    /*padding: 10px 14px 8px;*/
+}
+
+#wordhead0 {
+    display: block;
+}
+
+.labeltitle {
+    font-family: 'Haici Dict', "Times New Roman-Bold", auto;
+    color: #000;
+}
+
+.content {
+    background: #c8e6c9;
+    font-size: 14px;
+    /*line-height: 24px;*/
+    /*padding: 15px 8px 0;*/
+}
+
+.label-content {
+    background: #c8e6c9;
+    border-top: 1px solid #F1F1F1;
+    /*padding: 15px 8px;*/
+    /*margin-top: -10px;*/
+    /*margin-bottom: 10px;*/
+    font-size: 14px;
+    position: relative;
+    white-space: normal;
+}
+
+.label-content-unfold {
+    display: block;
+}
+
+.content dl {
+    padding-bottom: 0px;
+    background-color: #c8e6c9;
+}
+
+.content dd {
+    text-indent: 21px;
+}
+
+.cont-pos {
+    /*margin-bottom: 8px;*/
+}
+
+.cont-list {
+    /*padding-bottom: 8px;*/
+}
+
+.word-desc {
+    background: #c8e6c9;
+    /*margin-bottom: 10px;*/
+    /*padding: 15px 8px;*/
+    font-size: 14px;
+}
+
+.lab-cont-addscb img {
+    position: absolute;
+    right: 4px;
+    /*top: 12px;*/
+}
+
+.words-ce {
+    /*width: 64px;*/
+    /*height: 64px;*/
+    /*line-height: 64px;*/
+    text-align: center;
+    position: relative;
+    font-size: 14px;
+}
+
+.words-ce img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+}
+
+.words-ce span {
+    position: relative;
+    z-index: 2;
+}
+
+.cont-exam-ex {
+    /*line-height: 20px;*/
+}
+
+.cont-exam-trans {
+    /*padding-top: 2px;*/
+}
+
+.sound-words, .sound-data {
+    display: none;
+}
+
+
+
+
+
+
