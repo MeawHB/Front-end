@@ -1,5 +1,5 @@
 1.
-npm install require
+npm install request
 npm install cheerio
 
 2.ÐÂ½¨config.json
