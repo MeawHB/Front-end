@@ -1,0 +1,12 @@
+1.
+npm install require
+npm install cheerio
+
+2.新建config.json
+{
+  "username": "xxx",
+  "password": "yyy"
+}
+
+3.下载download-V2.js
+  运行node download-V2.js
